@@ -1,0 +1,17 @@
+<!-- templates/prescription_lifecycle_app/medication/detail.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Medication Details{% endblock %}
+{% block content %}
+<h1>{{ object.generic_name }}</h1>
+<ul>
+	<li>Brand Name: {{ object.brand_name }}</li>
+	<li>Chemical Name: {{ object.chemical_name }}</li>
+	<li>Price: {{ object.price }}</li>
+	<li>Status: {{ object.get_status_display }}</li>
+	<li>Created: {{ object.created_at }}</li>
+	<li>Updated: {{ object.updated_at }}</li>
+</ul>
+<a href="{% url 'prescription_lifecycle_app:medication-update' object.pk %}">Edit</a> |
+<a href="{% url 'prescription_lifecycle_app:medication-list' %}">Back to list</a>
+{% endblock %}

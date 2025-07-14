@@ -1,0 +1,13 @@
+<!-- templates/prescription_lifecycle_app/appointment/form.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}{{ view.object|default:'Schedule Appointment' }}{% endblock %}
+{% block content %}
+<h1>{{ view.object|yesno:'Edit Appointment,Schedule Appointment' }}</h1>
+<form method="post">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<button type="submit">Save</button>
+</form>
+<a href="{% url 'prescription_lifecycle_app:appointment-list' %}">Cancel</a>
+{% endblock %}

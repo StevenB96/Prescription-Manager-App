@@ -1,0 +1,32 @@
+<!-- templates/prescription_lifecycle_app/surgery_pharmacy/list.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Locations{% endblock %}
+{% block content %}
+<h1>Locations</h1>
+<a href="{% url 'prescription_lifecycle_app:location-create' %}">Add Location</a>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for loc in object_list %}
+		<tr>
+			<td>{{ loc.name }}</td>
+			<td>{{ loc.get_type_display }}</td>
+			<td>{{ loc.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_lifecycle_app:location-detail' loc.pk %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:location-update' loc.pk %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:location-delete' loc.pk %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

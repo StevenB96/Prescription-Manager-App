@@ -1,0 +1,34 @@
+<!-- templates/prescription_lifecycle_app/prescription/list.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Prescriptions{% endblock %}
+{% block content %}
+<h1>Prescriptions</h1>
+<a href="{% url 'prescription_lifecycle_app:prescription-create' %}">New Prescription</a>
+<table>
+	<thead>
+		<tr>
+			<th>Patient</th>
+			<th>Medication</th>
+			<th>Pharmacy</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for p in object_list %}
+		<tr>
+			<td>{{ p.patient }}</td>
+			<td>{{ p.medication }}</td>
+			<td>{{ p.pharmacy }}</td>
+			<td>{{ p.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_lifecycle_app:prescription-detail' p.pk %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:prescription-update' p.pk %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:prescription-delete' p.pk %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

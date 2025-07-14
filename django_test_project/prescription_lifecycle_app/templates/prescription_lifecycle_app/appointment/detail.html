@@ -1,0 +1,18 @@
+<!-- templates/prescription_lifecycle_app/appointment/detail.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Appointment Details{% endblock %}
+{% block content %}
+<h1>Appointment #{{ object.id }}</h1>
+<ul>
+	<li>Patient: {{ object.patient }}</li>
+	<li>Professional: {{ object.medical_professional }}</li>
+	<li>Surgery: {{ object.surgery }}</li>
+	<li>Time: {{ object.time }}</li>
+	<li>Status: {{ object.get_status_display }}</li>
+	<li>Created: {{ object.created_at }}</li>
+	<li>Updated: {{ object.updated_at }}</li>
+</ul>
+<a href="{% url 'prescription_lifecycle_app:appointment-update' object.pk %}">Edit</a> |
+<a href="{% url 'prescription_lifecycle_app:appointment-list' %}">Back to list</a>
+{% endblock %}

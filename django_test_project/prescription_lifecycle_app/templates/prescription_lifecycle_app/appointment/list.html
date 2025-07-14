@@ -1,0 +1,36 @@
+<!-- templates/prescription_lifecycle_app/appointment/list.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<h1>Appointments</h1>
+<a href="{% url 'prescription_lifecycle_app:appointment-create' %}">Schedule Appointment</a>
+<table>
+	<thead>
+		<tr>
+			<th>Patient</th>
+			<th>Professional</th>
+			<th>Surgery</th>
+			<th>Time</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for appt in object_list %}
+		<tr>
+			<td>{{ appt.patient }}</td>
+			<td>{{ appt.medical_professional }}</td>
+			<td>{{ appt.surgery }}</td>
+			<td>{{ appt.time }}</td>
+			<td>{{ appt.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_lifecycle_app:appointment-detail' appt.pk %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:appointment-update' appt.pk %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:appointment-delete' appt.pk %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

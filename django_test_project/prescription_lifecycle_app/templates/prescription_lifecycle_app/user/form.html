@@ -1,0 +1,12 @@
+<!-- templates/prescription_lifecycle_app/user/form.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}{{ view.object|default:'Create User' }}{% endblock %}
+{% block content %}
+<h1>{{ view.object|yesno:'Edit User,Create User' }}</h1>
+<form method="post">{% csrf_token %}
+	{{ form.as_p }}
+	<button type="submit">Save</button>
+</form>
+<a href="{% url 'prescription_lifecycle_app:user-list' %}">Cancel</a>
+{% endblock %}
