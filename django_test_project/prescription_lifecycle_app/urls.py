@@ -1,10 +1,16 @@
 # prescription_lifecycle_app/urls.py
 from django.urls import path
 from . import views
+from django.shortcuts import render
 
 app_name = 'prescription_lifecycle_app'
 
+def home(request):
+    return render(request, 'prescription_lifecycle_app/base.html')
+
 urlpatterns = [
+    path('', home, name='home'),
+
     # User CRUD
     path('users/', views.UserListView.as_view(), name='user-list'),
     path('users/create/', views.UserCreateView.as_view(), name='user-create'),
