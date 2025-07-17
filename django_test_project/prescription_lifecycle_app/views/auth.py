@@ -35,9 +35,7 @@ def register(request):
         User.create(username, email, pw_hash, role)
         messages.success(request, 'Registration successful. Please log in.')
         return redirect(reverse('login'))
-    return render(request, 'auth/register.html', {
-        'role_choices': User.ROLE_CHOICES.items()
-    })
+    return render(request, 'prescription_lifecycle_app/auth/register.html')
 
 # — Login —
 def login(request):
@@ -49,7 +47,7 @@ def login(request):
             request.session['user_id'] = user.id
             return redirect(request.GET.get('next', reverse('user-list')))
         messages.error(request, 'Invalid username or password')
-    return render(request, 'auth/login.html')
+    return render(request, 'prescription_lifecycle_app/auth/login.html')
 
 # — Logout —
 def logout(request):
