@@ -8,26 +8,26 @@
 <table>
 	<thead>
 		<tr>
-			<th>Patient</th>
-			<th>Professional</th>
-			<th>Surgery</th>
+			<th>Patient ID</th>
+			<th>Professional ID</th>
+			<th>Surgery ID</th>
 			<th>Time</th>
 			<th>Status</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for appt in object_list %}
+		{% for appointment in appointments %}
 		<tr>
-			<td>{{ appt.patient }}</td>
-			<td>{{ appt.medical_professional }}</td>
-			<td>{{ appt.surgery }}</td>
-			<td>{{ appt.time }}</td>
-			<td>{{ appt.get_status_display }}</td>
+			<td>{{ appointment.patient_id }}</td>
+			<td>{{ appointment.medical_professional_id }}</td>
+			<td>{{ appointment.surgery_id }}</td>
+			<td>{{ appointment.time }}</td>
+			<td>{{ appointment.get_status_display }}</td>
 			<td>
-				<a href="{% url 'prescription_lifecycle_app:appointment-detail' appt.pk %}">View</a> |
-				<a href="{% url 'prescription_lifecycle_app:appointment-update' appt.pk %}">Edit</a> |
-				<a href="{% url 'prescription_lifecycle_app:appointment-delete' appt.pk %}">Delete</a>
+				<a href="{% url 'prescription_lifecycle_app:appointment-detail' appointment.id %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:appointment-update' appointment.id %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:appointment-delete' appointment.id %}">Delete</a>
 			</td>
 		</tr>
 		{% endfor %}

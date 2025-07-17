@@ -8,24 +8,28 @@
 <table>
 	<thead>
 		<tr>
-			<th>Patient</th>
-			<th>Medication</th>
-			<th>Pharmacy</th>
+			<th>Pharmacy ID</th>
+			<th>Medication ID</th>
+			<th>Prescriber ID</th>
+			<th>Patient ID</th>
+			<th>Exemption</th>
 			<th>Status</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for p in object_list %}
+		{% for prescription in prescriptions %}
 		<tr>
-			<td>{{ p.patient }}</td>
-			<td>{{ p.medication }}</td>
-			<td>{{ p.pharmacy }}</td>
-			<td>{{ p.get_status_display }}</td>
+			<td>{{ prescription.pharmacy_id }}</td>
+			<td>{{ prescription.medication_id }}</td>
+			<td>{{ prescription.prescriber_id }}</td>
+			<td>{{ prescription.patient_id }}</td>
+			<td>{{ prescription.get_exemption_display }}</td>
+			<td>{{ prescription.get_status_display }}</td>
 			<td>
-				<a href="{% url 'prescription_lifecycle_app:prescription-detail' p.pk %}">View</a> |
-				<a href="{% url 'prescription_lifecycle_app:prescription-update' p.pk %}">Edit</a> |
-				<a href="{% url 'prescription_lifecycle_app:prescription-delete' p.pk %}">Delete</a>
+				<a href="{% url 'prescription_lifecycle_app:prescription-detail' prescription.id %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:prescription-update' prescription.id %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:prescription-delete' prescription.id %}">Delete</a>
 			</td>
 		</tr>
 		{% endfor %}

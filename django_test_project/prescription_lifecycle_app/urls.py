@@ -68,14 +68,14 @@ urlpatterns = [
     # Prescription CRUD
     path('prescriptions/', views.prescription_list, name='prescription-list'),
     path('prescriptions/new/', views.prescription_create, name='prescription-create'),
-    path('prescriptions/<str:item_id>/', views.prescription_detail, name='prescription-detail'),
-    path('prescriptions/<str:item_id>/edit/', views.prescription_update, name='prescription-update'),
-    path('prescriptions/<str:item_id>/delete/', views.prescription_delete, name='prescription-delete'),
+    path('prescriptions/<str:prescription_id>/', views.prescription_detail, name='prescription-detail'),
+    path('prescriptions/<str:prescription_id>/edit/', views.prescription_update, name='prescription-update'),
+    path('prescriptions/<str:prescription_id>/delete/', views.prescription_delete, name='prescription-delete'),
 
     # Appointment CRUD
     path('appointments/', views.appointment_list, name='appointment-list'),
     path('appointments/new/', views.appointment_create, name='appointment-create'),
-    path('appointments/<str:item_id>/', views.appointment_detail, name='appointment-detail'),
-    path('appointments/<str:item_id>/edit/', views.appointment_update, name='appointment-update'),
-    path('appointments/<str:item_id>/delete/', views.appointment_delete, name='appointment-delete'),
+    path('appointments/<str:appointment_id>/', views.appointment_detail, name='appointment-detail'),
+    path('appointments/<str:appointment_id>/edit/', views.appointment_update, name='appointment-update'),
+    path('appointments/<str:appointment_id>/delete/', views.appointment_delete, name='appointment-delete'),
 ]

@@ -42,15 +42,18 @@
 			required
 		>
 			{% for code, label in type_choices %}
+			{% if code|stringformat:'s' == form.type.value|stringformat:'s' %}
 			<option
 				value="{{ code }}"
-				{%
-				if
-				form.type.value|stringformat:'s'==code|stringformat:'s'
-				%}selected{%
-				endif
-				%}
+				selected
 			>{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+
+			{% for code, label in type_choices %}
+			{% if code|stringformat:'s' != form.type.value|stringformat:'s' %}
+			<option value="{{ code }}">{{ label }}</option>
+			{% endif %}
 			{% endfor %}
 		</select>
 	</p>
@@ -62,16 +65,20 @@
 			name="status"
 			required
 		>
+
 			{% for code, label in status_choices %}
+			{% if code|stringformat:'s' == form.status.value|stringformat:'s' %}
 			<option
 				value="{{ code }}"
-				{%
-				if
-				form.status.value|stringformat:'s'==code|stringformat:'s'
-				%}selected{%
-				endif
-				%}
+				selected
 			>{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+
+			{% for code, label in status_choices %}
+			{% if code|stringformat:'s' != form.status.value|stringformat:'s' %}
+			<option value="{{ code }}">{{ label }}</option>
+			{% endif %}
 			{% endfor %}
 		</select>
 	</p>

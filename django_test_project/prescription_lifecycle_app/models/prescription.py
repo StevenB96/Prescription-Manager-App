@@ -30,6 +30,10 @@ class Prescription:
         STATUS_EXPIRED: "Expired",
     }
 
+    EXEMPTION_CHOICES = list(EXEMPTION_DISPLAY.items())
+
+    STATUS_CHOICES = list(STATUS_DISPLAY.items())
+
     def __init__(self, data):
         self._data = data
 

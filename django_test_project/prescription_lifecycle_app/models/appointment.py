@@ -18,6 +18,8 @@ class Appointment:
         STATUS_NO_SHOW: "No Show",
     }
 
+    STATUS_CHOICES = list(STATUS_DISPLAY.items())
+
     def __init__(self, data):
         self._data = data
 
