@@ -1,0 +1,82 @@
+<!-- templates/prescription_lifecycle_app/facility/form.html -->
+
+{% extends 'prescription_lifecycle_app/base.html' %}
+
+{% block title %}
+{{ form_title }}
+{% endblock %}
+
+{% block content %}
+<h1>{{ form_title }}</h1>
+
+<form method="post">
+	{% csrf_token %}
+
+	<p>
+		<label for="name">Name</label><br>
+		<input
+			type="text"
+			id="name"
+			name="name"
+			value="{{ form.name.value|default:'' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="address">Address</label><br>
+		<input
+			type="text"
+			id="address"
+			name="address"
+			value="{{ form.address.value|default:'' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="type">Type</label><br>
+		<select
+			id="type"
+			name="type"
+			required
+		>
+			{% for code, label in type_choices %}
+			<option
+				value="{{ code }}"
+				{%
+				if
+				form.type.value|stringformat:'s'==code|stringformat:'s'
+				%}selected{%
+				endif
+				%}
+			>{{ label }}</option>
+			{% endfor %}
+		</select>
+	</p>
+
+	<p>
+		<label for="status">Status</label><br>
+		<select
+			id="status"
+			name="status"
+			required
+		>
+			{% for code, label in status_choices %}
+			<option
+				value="{{ code }}"
+				{%
+				if
+				form.status.value|stringformat:'s'==code|stringformat:'s'
+				%}selected{%
+				endif
+				%}
+			>{{ label }}</option>
+			{% endfor %}
+		</select>
+	</p>
+
+	<button type="submit">{{ submit_label }}</button>
+	<a href="{% url 'prescription_lifecycle_app:facility-list' %}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,18 +1,29 @@
 from bson.objectid import ObjectId
 from datetime import datetime
-from prescription_lifecycle_app.db import medication_col
 
-class Medication:
+from prescription_lifecycle_app.db import facility_col
+
+class Facility:
     """
-    A PyMongo‑backed wrapper for the 'medications' collection.
+    A PyMongo-backed wrapper for the 'facility' collection.
     """
-    STATUS_ACTIVE   = 0
+    TYPE_SURGERY = 0
+    TYPE_PHARMACY = 1
+
+    STATUS_ACTIVE = 0
     STATUS_INACTIVE = 1
+
+    TYPE_DISPLAY = {
+        TYPE_SURGERY: "Surgery",
+        TYPE_PHARMACY: "Pharmacy",
+    }
 
     STATUS_DISPLAY = {
         STATUS_ACTIVE: "Active",
         STATUS_INACTIVE: "Inactive",
     }
+
+    TYPE_CHOICES = list(TYPE_DISPLAY.items())
 
     STATUS_CHOICES = list(STATUS_DISPLAY.items())
 
@@ -21,23 +32,19 @@ class Medication:
 
     @property
     def id(self):
-        return str(self._data["_id"])
+        return str(self._data.get("_id"))
 
     @property
-    def generic_name(self):
-        return self._data["generic_name"]
+    def name(self):
+        return self._data.get("name")
 
     @property
-    def brand_name(self):
-        return self._data.get("brand_name")
+    def address(self):
+        return self._data.get("address")
 
     @property
-    def chemical_name(self):
-        return self._data.get("chemical_name")
-
-    @property
-    def price(self):
-        return self._data.get("price", 0)
+    def type(self):
+        return self._data.get("type")
 
     @property
     def status(self):
@@ -51,24 +58,25 @@ class Medication:
     def updated_at(self):
         return self._data.get("updated_at")
     
+    def get_type_display(self):
+        return self.TYPE_DISPLAY.get(self.type, "Unknown")
+
     def get_status_display(self):
         return self.STATUS_DISPLAY.get(self.status, "Unknown")
 
     @classmethod
-    def create(cls, generic_name, brand_name=None, chemical_name=None,
-               price=0, status=STATUS_ACTIVE):
+    def create(cls, name, address, type, status=STATUS_ACTIVE):
         now = datetime.utcnow()
         doc = {
-            "generic_name": generic_name,
-            "brand_name": brand_name,
-            "chemical_name": chemical_name,
-            "price": price,
+            "name": name,
+            "address": address,
+            "type": type,
             "status": status,
             "created_at": now,
             "updated_at": now,
         }
-        res = medication_col.insert_one(doc)
-        doc["_id"] = res.inserted_id
+        result = facility_col.insert_one(doc)
+        doc["_id"] = result.inserted_id
         return cls(doc)
 
     @classmethod
@@ -77,22 +85,22 @@ class Medication:
             oid = ObjectId(id)
         except Exception:
             return None
-        doc = medication_col.find_one({"_id": oid})
+        doc = facility_col.find_one({"_id": oid})
         return cls(doc) if doc else None
 
     @classmethod
     def list_all(cls):
-        return [cls(d) for d in medication_col.find().sort("created_at", 1)]
+        return [cls(d) for d in facility_col.find().sort("created_at", 1)]
 
     @classmethod
     def update(cls, id, **kwargs):
-        allowed = {"generic_name", "brand_name", "chemical_name", "price", "status"}
+        allowed = {"name", "address", "type", "status"}
         fields = {k: v for k, v in kwargs.items() if k in allowed}
         if not fields:
             return None
         fields["updated_at"] = datetime.utcnow()
         oid = ObjectId(id)
-        medication_col.update_one({"_id": oid}, {"$set": fields})
+        facility_col.update_one({"_id": oid}, {"$set": fields})
         return cls.get(id)
 
     @classmethod
@@ -101,5 +109,5 @@ class Medication:
             oid = ObjectId(id)
         except Exception:
             return False
-        res = medication_col.delete_one({"_id": oid})
+        res = facility_col.delete_one({"_id": oid})
         return res.deleted_count == 1

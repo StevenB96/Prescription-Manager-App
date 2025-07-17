@@ -3,14 +3,14 @@
 {% extends 'prescription_lifecycle_app/base.html' %}
 {% block title %}User Details{% endblock %}
 {% block content %}
-<h1>{{ object.username }}</h1>
+<h1>{{ user.username }}</h1>
 <ul>
-	<li>Email: {{ object.email }}</li>
-	<li>Role: {{ object.get_role_display }}</li>
-	<li>Status: {{ object.get_status_display }}</li>
-	<li>Created: {{ object.created_at }}</li>
-	<li>Updated: {{ object.updated_at }}</li>
+	<li>Email: {{ user.email }}</li>
+	<li>Role: {{ user.get_role_display }}</li>
+	<li>Status: {{ user.get_status_display }}</li>
+	<li>Created: {{ user.created_at }}</li>
+	<li>Updated: {{ user.updated_at }}</li>
 </ul>
-<a href="{% url 'prescription_lifecycle_app:user-update' object.pk %}">Edit</a> |
+<a href="{% url 'prescription_lifecycle_app:user-update' user.id %}">Edit</a> |
 <a href="{% url 'prescription_lifecycle_app:user-list' %}">Back to list</a>
 {% endblock %}

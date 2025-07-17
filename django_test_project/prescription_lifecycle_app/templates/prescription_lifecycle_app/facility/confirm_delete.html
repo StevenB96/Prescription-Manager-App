@@ -1,11 +1,11 @@
-<!-- templates/prescription_lifecycle_app/user/confirm_delete.html -->
+<!-- templates/prescription_lifecycle_app/facility/confirm_delete.html -->
 
 {% extends 'prescription_lifecycle_app/base.html' %}
 {% block title %}Confirm Delete{% endblock %}
 {% block content %}
-<h1>Delete {{ user.username }}?</h1>
+<h1>Delete {{ facility.name }}?</h1>
 <form method="post">{% csrf_token %}
 	<button type="submit">Yes, delete</button>
 </form>
-<a href="{% url 'prescription_lifecycle_app:user-list' %}">Cancel</a>
+<a href="{% url 'prescription_lifecycle_app:facility-list' %}">Cancel</a>
 {% endblock %}

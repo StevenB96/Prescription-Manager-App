@@ -1,4 +1,5 @@
 # prescription_lifecycle_app/urls.py
+
 from django.urls import path
 from . import views
 from django.shortcuts import render
@@ -11,38 +12,70 @@ def home(request):
 urlpatterns = [
     path('', home, name='home'),
 
-    # User CRUD
-    path('users/', views.UserListView.as_view(), name='user-list'),
-    path('users/create/', views.UserCreateView.as_view(), name='user-create'),
-    path('users/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
-    path('users/<int:pk>/update/', views.UserUpdateView.as_view(), name='user-update'),
-    path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='user-delete'),
+    # Auth
+    path('register/', 
+         views.auth.register, 
+         name='register'),
+    path('login/', 
+         views.auth.login, 
+         name='login'),
+    path('logout/', 
+         views.auth.logout, 
+         name='logout'),
 
-    # Surgery/Pharmacy CRUD
-    path('locations/', views.SurgeryPharmacyListView.as_view(), name='location-list'),
-    path('locations/create/', views.SurgeryPharmacyCreateView.as_view(), name='location-create'),
-    path('locations/<int:pk>/', views.SurgeryPharmacyDetailView.as_view(), name='location-detail'),
-    path('locations/<int:pk>/update/', views.SurgeryPharmacyUpdateView.as_view(), name='location-update'),
-    path('locations/<int:pk>/delete/', views.SurgeryPharmacyDeleteView.as_view(), name='location-delete'),
+    # OAuth2
+    path('authorize/', 
+         views.auth.authorize, 
+         name='authorize'),
+    path('token/', 
+         views.auth.token, 
+         name='token'),
+    path('api/profile/', 
+         views.auth.api_profile, 
+         name='api-profile'),
+
+    # Users CRUD
+    path('users/', 
+         views.user.user_list, 
+         name='user-list'),
+    path('users/new/', 
+         views.user.user_create, 
+         name='user-create'),
+    path('users/<str:user_id>/', 
+         views.user.user_detail, 
+         name='user-detail'),
+    path('users/<str:user_id>/edit/', 
+         views.user.user_update, 
+         name='user-update'),
+    path('users/<str:user_id>/delete/',
+         views.user.user_delete, 
+         name='user-delete'),
+
+     # Facility CRUD
+    path('facilities/', views.facility_list, name='facility-list'),
+    path('facilities/new/', views.facility_create, name='facility-create'),
+    path('facilities/<str:facility_id>/', views.facility_detail, name='facility-detail'),
+    path('facilities/<str:facility_id>/edit/', views.facility_update, name='facility-update'),
+    path('facilities/<str:facility_id>/delete/', views.facility_delete, name='facility-delete'),
 
     # Medication CRUD
-    path('medications/', views.MedicationListView.as_view(), name='medication-list'),
-    path('medications/create/', views.MedicationCreateView.as_view(), name='medication-create'),
-    path('medications/<int:pk>/', views.MedicationDetailView.as_view(), name='medication-detail'),
-    path('medications/<int:pk>/update/', views.MedicationUpdateView.as_view(), name='medication-update'),
-    path('medications/<int:pk>/delete/', views.MedicationDeleteView.as_view(), name='medication-delete'),
+    path('medications/', views.medication_list, name='medication-list'),
+    path('medications/new/', views.medication_create, name='medication-create'),
+    path('medications/<str:medication_id>/', views.medication_detail, name='medication-detail'),
+    path('medications/<str:medication_id>/edit/', views.medication_update, name='medication-update'),
+    path('medications/<str:medication_id>/delete/', views.medication_delete, name='medication-delete'),
 
     # Prescription CRUD
-    path('prescriptions/', views.PrescriptionListView.as_view(), name='prescription-list'),
-    path('prescriptions/create/', views.PrescriptionCreateView.as_view(), name='prescription-create'),
-    path('prescriptions/<int:pk>/', views.PrescriptionDetailView.as_view(), name='prescription-detail'),
-    path('prescriptions/<int:pk>/update/', views.PrescriptionUpdateView.as_view(), name='prescription-update'),
-    path('prescriptions/<int:pk>/delete/', views.PrescriptionDeleteView.as_view(), name='prescription-delete'),
+    path('prescriptions/', views.prescription_list, name='prescription-list'),
+    path('prescriptions/new/', views.prescription_create, name='prescription-create'),
+    path('prescriptions/<str:item_id>/', views.prescription_detail, name='prescription-detail'),
+    path('prescriptions/<str:item_id>/edit/', views.prescription_update, name='prescription-update'),
+    path('prescriptions/<str:item_id>/delete/', views.prescription_delete, name='prescription-delete'),
 
     # Appointment CRUD
-    path('appointments/', views.AppointmentListView.as_view(), name='appointment-list'),
-    path('appointments/create/', views.AppointmentCreateView.as_view(), name='appointment-create'),
-    path('appointments/<int:pk>/', views.AppointmentDetailView.as_view(), name='appointment-detail'),
-    path('appointments/<int:pk>/update/', views.AppointmentUpdateView.as_view(), name='appointment-update'),
-    path('appointments/<int:pk>/delete/', views.AppointmentDeleteView.as_view(), name='appointment-delete'),
+    path('appointments/', views.appointment_list, name='appointment-list'),
+    path('appointments/new/', views.appointment_create, name='appointment-create'),
+    path('appointments/<str:item_id>/', views.appointment_detail, name='appointment-detail'),
+    path('appointments/<str:item_id>/edit/', views.appointment_update, name='appointment-update'),
+    path('appointments/<str:item_id>/delete/', views.appointment_delete, name='appointment-delete'),
 ]

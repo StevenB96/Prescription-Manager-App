@@ -1,12 +1,82 @@
 <!-- templates/prescription_lifecycle_app/user/form.html -->
 
 {% extends 'prescription_lifecycle_app/base.html' %}
-{% block title %}{{ view.object|default:'Create User' }}{% endblock %}
+
+{% block title %}
+{{ form_title }}
+{% endblock %}
+
 {% block content %}
-<h1>{{ view.object|yesno:'Edit User,Create User' }}</h1>
-<form method="post">{% csrf_token %}
-	{{ form.as_p }}
-	<button type="submit">Save</button>
+<h1>{{ form_title }}</h1>
+
+<form method="post">
+	{% csrf_token %}
+
+	<p>
+		<label for="generic_name">Generic Name</label><br>
+		<input
+			type="text"
+			id="generic_name"
+			name="generic_name"
+			value="{{ form.generic_name.value|default:'' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="brand_name">Brand Name</label><br>
+		<input
+			type="text"
+			id="brand_name"
+			name="brand_name"
+			value="{{ form.brand_name.value|default:'' }}"
+		>
+	</p>
+
+	<p>
+		<label for="chemical_name">Chemical Name</label><br>
+		<input
+			type="text"
+			id="chemical_name"
+			name="chemical_name"
+			value="{{ form.chemical_name.value|default:'' }}"
+		>
+	</p>
+
+	<p>
+		<label for="price">Price</label><br>
+		<input
+			type="number"
+			step="0.01"
+			id="price"
+			name="price"
+			value="{{ form.price.value|default:'0.00' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="status">Status</label><br>
+		<select
+			id="status"
+			name="status"
+			required
+		>
+			{% for code, label in status_choices %}
+			<option
+				value="{{ code }}"
+				{%
+				if
+				form.status.value|stringformat:"s"==code|stringformat:"s"
+				%}selected{%
+				endif
+				%}
+			>{{ label }}</option>
+			{% endfor %}
+		</select>
+	</p>
+
+	<button type="submit">{{ submit_label }}</button>
+	<a href="{% url 'prescription_lifecycle_app:medication-list' %}">Cancel</a>
 </form>
-<a href="{% url 'prescription_lifecycle_app:user-list' %}">Cancel</a>
 {% endblock %}

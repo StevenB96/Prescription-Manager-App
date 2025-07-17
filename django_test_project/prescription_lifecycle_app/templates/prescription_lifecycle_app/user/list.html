@@ -16,16 +16,16 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for user in object_list %}
+		{% for user in users %}
 		<tr>
 			<td>{{ user.username }}</td>
 			<td>{{ user.email }}</td>
 			<td>{{ user.get_role_display }}</td>
 			<td>{{ user.get_status_display }}</td>
 			<td>
-				<a href="{% url 'prescription_lifecycle_app:user-detail' user.pk %}">View</a> |
-				<a href="{% url 'prescription_lifecycle_app:user-update' user.pk %}">Edit</a> |
-				<a href="{% url 'prescription_lifecycle_app:user-delete' user.pk %}">Delete</a>
+				<a href="{% url 'prescription_lifecycle_app:user-detail' user.id %}">View</a> |
+				<a href="{% url 'prescription_lifecycle_app:user-update' user.id %}">Edit</a> |
+				<a href="{% url 'prescription_lifecycle_app:user-delete' user.id %}">Delete</a>
 			</td>
 		</tr>
 		{% endfor %}

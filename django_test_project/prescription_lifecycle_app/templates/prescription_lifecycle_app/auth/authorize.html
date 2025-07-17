@@ -1,0 +1,23 @@
+{% extends 'prescription_lifecycle_app/base.html' %}
+{% block title %}Authorize Application{% endblock %}
+{% block content %}
+<h1>Authorize “{{ client.client_id }}”</h1>
+
+<p><strong>Requested scopes:</strong></p>
+<ul>
+	{% for scope in scopes %}
+	<li>{{ scope }}</li>
+	{% endfor %}
+</ul>
+
+<form method="post">{% csrf_token %}
+	<button
+		name="confirm"
+		value="yes"
+	>Approve</button>
+	<button
+		name="confirm"
+		value="no"
+	>Deny</button>
+</form>
+{% endblock %}
