@@ -1,0 +1,38 @@
+<!-- templates/prescription_manager_app/prescription/list.html -->
+
+{% extends 'prescription_manager_app/base.html' %}
+{% block title %}Prescriptions{% endblock %}
+{% block content %}
+<h1>Prescriptions</h1>
+<a href="{% url 'prescription_manager_app:prescription-create' %}">New Prescription</a>
+<table>
+	<thead>
+		<tr>
+			<th>Pharmacy ID</th>
+			<th>Medication ID</th>
+			<th>Prescriber ID</th>
+			<th>Patient ID</th>
+			<th>Exemption</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for prescription in prescriptions %}
+		<tr>
+			<td>{{ prescription.pharmacy_id }}</td>
+			<td>{{ prescription.medication_id }}</td>
+			<td>{{ prescription.prescriber_id }}</td>
+			<td>{{ prescription.patient_id }}</td>
+			<td>{{ prescription.get_exemption_display }}</td>
+			<td>{{ prescription.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_manager_app:prescription-detail' prescription.id %}">View</a> |
+				<a href="{% url 'prescription_manager_app:prescription-update' prescription.id %}">Edit</a> |
+				<a href="{% url 'prescription_manager_app:prescription-delete' prescription.id %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

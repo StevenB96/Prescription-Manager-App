@@ -1,0 +1,16 @@
+<!-- templates/prescription_manager_app/user/detail.html -->
+
+{% extends 'prescription_manager_app/base.html' %}
+{% block title %}User Details{% endblock %}
+{% block content %}
+<h1>{{ user.username }}</h1>
+<ul>
+	<li>Email: {{ user.email }}</li>
+	<li>Role: {{ user.get_role_display }}</li>
+	<li>Status: {{ user.get_status_display }}</li>
+	<li>Created: {{ user.created_at }}</li>
+	<li>Updated: {{ user.updated_at }}</li>
+</ul>
+<a href="{% url 'prescription_manager_app:user-update' user.id %}">Edit</a> |
+<a href="{% url 'prescription_manager_app:user-list' %}">Back to list</a>
+{% endblock %}

@@ -1,0 +1,18 @@
+<!-- templates/prescription_manager_app/appointment/detail.html -->
+
+{% extends 'prescription_manager_app/base.html' %}
+{% block title %}Appointment Details{% endblock %}
+{% block content %}
+<h1>Appointment #{{ appointment.id }}</h1>
+<ul>
+	<li>Patient: {{ appointment.patient_id }}</li>
+	<li>Professional: {{ appointment.medical_professional_id }}</li>
+	<li>Surgery: {{ appointment.surgery_id }}</li>
+	<li>Time: {{ appointment.time }}</li>
+	<li>Status: {{ appointment.get_status_display }}</li>
+	<li>Created: {{ appointment.created_at }}</li>
+	<li>Updated: {{ appointment.updated_at }}</li>
+</ul>
+<a href="{% url 'prescription_manager_app:appointment-update' appointment.id %}">Edit</a> |
+<a href="{% url 'prescription_manager_app:appointment-list' %}">Back to list</a>
+{% endblock %}

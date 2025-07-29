@@ -1,0 +1,41 @@
+<!-- templates/prescription_manager_app/medication/list.html -->
+
+{% extends 'prescription_manager_app/base.html' %}
+{% block title %}Medications{% endblock %}
+{% block content %}
+<h1>Medications</h1>
+<p><a href="{% url 'prescription_manager_app:medication-create' %}">Add Medication</a></p>
+
+{% if medications %}
+<table>
+	<thead>
+		<tr>
+			<th>Generic Name</th>
+			<th>Brand Name</th>
+			<th>Chemical Name</th>
+			<th>Price</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for medication in medications %}
+		<tr>
+			<td>{{ medication.generic_name }}</td>
+			<td>{{ medication.brand_name|default:"—" }}</td>
+			<td>{{ medication.chemical_name|default:"—" }}</td>
+			<td>£{{ medication.price }}</td>
+			<td>{{ medication.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_manager_app:medication-detail' medication.id %}">View</a> |
+				<a href="{% url 'prescription_manager_app:medication-update' medication.id %}">Edit</a> |
+				<a href="{% url 'prescription_manager_app:medication-delete' medication.id %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% else %}
+<p>No medications found.</p>
+{% endif %}
+{% endblock %}

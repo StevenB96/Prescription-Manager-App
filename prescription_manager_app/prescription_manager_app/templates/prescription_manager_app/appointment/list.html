@@ -1,0 +1,36 @@
+<!-- templates/prescription_manager_app/appointment/list.html -->
+
+{% extends 'prescription_manager_app/base.html' %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<h1>Appointments</h1>
+<a href="{% url 'prescription_manager_app:appointment-create' %}">Schedule Appointment</a>
+<table>
+	<thead>
+		<tr>
+			<th>Patient ID</th>
+			<th>Professional ID</th>
+			<th>Surgery ID</th>
+			<th>Time</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for appointment in appointments %}
+		<tr>
+			<td>{{ appointment.patient_id }}</td>
+			<td>{{ appointment.medical_professional_id }}</td>
+			<td>{{ appointment.surgery_id }}</td>
+			<td>{{ appointment.time }}</td>
+			<td>{{ appointment.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_manager_app:appointment-detail' appointment.id %}">View</a> |
+				<a href="{% url 'prescription_manager_app:appointment-update' appointment.id %}">Edit</a> |
+				<a href="{% url 'prescription_manager_app:appointment-delete' appointment.id %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
