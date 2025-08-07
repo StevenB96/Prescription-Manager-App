@@ -1,7 +1,7 @@
 # from datetime import datetime, timedelta
 # from bson.objectid import ObjectId
 
-# from prescription_manager_app.db import oauth_client_col, oauth_code_col, oauth_token_col
+# from prescription_manager_app.db.connection import oauth_client_col, oauth_code_col, oauth_token_col
 # from authlib.oauth2.rfc6749 import grants
 
 # # — Client lookup —

@@ -1,7 +1,7 @@
 from bson.objectid import ObjectId
 from datetime import datetime
 
-from prescription_manager_app.db import user_col
+from prescription_manager_app.db.connection import user_col
 
 class User:
     """

@@ -16,10 +16,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
+from graphene_django.views import GraphQLView
+from prescription_manager_app.schema import schema
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    path('', include('prescription_manager_app.urls')),
-    path('oauth/', include('oauth_service.urls')),
+    path('', 
+        include('prescription_manager_app.urls')
+    ),
+    path(
+        'oauth/', 
+        include('oauth_service.urls')
+    ),
+    path(
+        "graphql/", 
+        csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))
+    ),
 ]

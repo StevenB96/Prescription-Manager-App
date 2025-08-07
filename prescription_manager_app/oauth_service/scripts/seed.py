@@ -13,7 +13,7 @@
 #     sys.path.insert(0, PROJECT_ROOT)
 
 # # ── DB Collections ──
-# from prescription_manager_app.db import (
+# from prescription_manager_app.db.connection import (
 #     user_col,
 #     medication_col,
 #     oauth_client_col,
