@@ -1,3 +1,5 @@
+# prescription_project\urls.py
+
 """
 URL configuration for prescription_project project.
 
@@ -18,6 +20,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', include('prescription_manager_app.urls')),
+    path('', include('prescription_manager_app.urls')),
     path('oauth/', include('oauth_service.urls')),
 ]
