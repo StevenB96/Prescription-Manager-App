@@ -1,0 +1,187 @@
+Here’s a step-by-step guide to integrating GraphQL into a Django project using Graphene-Django:
+
+1. Install Dependencies
+bash
+Kopier kode
+pip install django graphene-django
+2. Add to INSTALLED_APPS
+In your settings.py:
+
+python
+Kopier kode
+INSTALLED_APPS = [
+    # … other apps …
+    'django.contrib.staticfiles',      # required for GraphiQL
+    'graphene_django',
+    'your_app',                        # the app you’ll expose via GraphQL
+]
+
+GRAPHENE = {
+    'SCHEMA': 'your_project.schema.schema'  # path to your root schema
+}
+3. Define a Django Model
+In your_app/models.py:
+
+python
+Kopier kode
+from django.db import models
+
+class Book(models.Model):
+    title  = models.CharField(max_length=200)
+    author = models.CharField(max_length=200)
+    published = models.DateField()
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+Run migrations:
+
+bash
+Kopier kode
+python manage.py makemigrations
+python manage.py migrate
+4. Create a Graphene Type for Your Model
+In your_app/schema.py:
+
+python
+Kopier kode
+import graphene
+from graphene_django import DjangoObjectType
+from .models import Book
+
+class BookType(DjangoObjectType):
+    class Meta:
+        model = Book
+        fields = ("id", "title", "author", "published")
+5. Add Queries
+Still in your_app/schema.py, extend:
+
+python
+Kopier kode
+class Query(graphene.ObjectType):
+    all_books = graphene.List(BookType)
+    book_by_id = graphene.Field(BookType, id=graphene.Int(required=True))
+
+    def resolve_all_books(root, info):
+        return Book.objects.all()
+
+    def resolve_book_by_id(root, info, id):
+        return Book.objects.get(pk=id)
+6. Add Mutations (Create / Update / Delete)
+Append to your_app/schema.py:
+
+python
+Kopier kode
+class CreateBook(graphene.Mutation):
+    book = graphene.Field(BookType)
+
+    class Arguments:
+        title     = graphene.String(required=True)
+        author    = graphene.String(required=True)
+        published = graphene.types.datetime.Date(required=True)
+
+    def mutate(self, info, title, author, published):
+        book = Book(title=title, author=author, published=published)
+        book.save()
+        return CreateBook(book=book)
+
+class UpdateBook(graphene.Mutation):
+    book = graphene.Field(BookType)
+
+    class Arguments:
+        id        = graphene.ID(required=True)
+        title     = graphene.String()
+        author    = graphene.String()
+        published = graphene.types.datetime.Date()
+
+    def mutate(self, info, id, title=None, author=None, published=None):
+        book = Book.objects.get(pk=id)
+        if title is not None:
+            book.title = title
+        if author is not None:
+            book.author = author
+        if published is not None:
+            book.published = published
+        book.save()
+        return UpdateBook(book=book)
+
+class DeleteBook(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    def mutate(self, info, id):
+        book = Book.objects.get(pk=id)
+        book.delete()
+        return DeleteBook(ok=True)
+
+class Mutation(graphene.ObjectType):
+    create_book = CreateBook.Field()
+    update_book = UpdateBook.Field()
+    delete_book = DeleteBook.Field()
+7. Wire Up the Root Schema
+Create your_project/schema.py:
+
+python
+Kopier kode
+import graphene
+import your_app.schema
+
+class Query(your_app.schema.Query, graphene.ObjectType):
+    pass
+
+class Mutation(your_app.schema.Mutation, graphene.ObjectType):
+    pass
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
+8. Configure URL Routing
+In your_project/urls.py:
+
+python
+Kopier kode
+from django.urls import path
+from graphene_django.views import GraphQLView
+from django.views.decorators.csrf import csrf_exempt
+
+urlpatterns = [
+    # … other URLs …
+    path(
+        "graphql/",
+        csrf_exempt(GraphQLView.as_view(graphiql=True)),
+        name="graphql"
+    ),
+]
+graphiql=True enables the interactive IDE at /graphql/.
+
+9. Test It Out
+Start the server
+
+bash
+Kopier kode
+python manage.py runserver
+Open http://localhost:8000/graphql/ in your browser.
+
+Try a query, e.g.:
+
+graphql
+Kopier kode
+query {
+  allBooks {
+    id
+    title
+    author
+    published
+  }
+}
+Try a mutation, e.g.:
+
+graphql
+Kopier kode
+mutation {
+  createBook(title: "1984", author: "George Orwell", published: "1949-06-08") {
+    book {
+      id
+      title
+    }
+  }
+}
