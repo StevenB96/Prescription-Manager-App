@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'prescription_manager_app',
     'oauth_service',
+    'graphene-django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -126,8 +127,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Use Django’s session DB or switch to cache if you don’t want a SQL backend:
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-AUTHENTICATION_BACKENDS = [
-    'prescription_manager_app.backends.MongoBackend',
-]
-
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+GRAPHENE = {
+    "SCHEMA": "prescription_manager_app.schema.schema",
+}
