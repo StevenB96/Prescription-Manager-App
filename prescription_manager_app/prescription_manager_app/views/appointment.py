@@ -11,7 +11,7 @@ def appointment_list(request):
     appointments = Appointment.list_all()
     return render(
         request,
-        'prescription_manager_app/appointment/list.html',
+        'prescription_manager_app/admin/appointment/list.html',
         {'appointments': appointments}
     )
 
@@ -35,7 +35,7 @@ def appointment_create(request):
         'status': {'value': ''},
     }
 
-    return render(request, 'prescription_manager_app/appointment/form.html', {
+    return render(request, 'prescription_manager_app/admin/appointment/form.html', {
         'form': form_data,
         'status_choices': Appointment.STATUS_CHOICES,
         'form_title': 'Schedule Appointment',
@@ -49,7 +49,7 @@ def appointment_detail(request, appointment_id):
     if not appointment:
         return redirect(reverse('prescription_manager_app:appointment-list'))
 
-    return render(request, 'prescription_manager_app/appointment/detail.html', {
+    return render(request, 'prescription_manager_app/admin/appointment/detail.html', {
         'appointment': appointment
     })
 
@@ -78,7 +78,7 @@ def appointment_update(request, appointment_id):
         'status': {'value': appointment.status},
     }
 
-    return render(request, 'prescription_manager_app/appointment/form.html', {
+    return render(request, 'prescription_manager_app/admin/appointment/form.html', {
         'form': form_data,
         'status_choices': Appointment.STATUS_CHOICES,
         'form_title': 'Edit Appointment',
@@ -96,6 +96,6 @@ def appointment_delete(request, appointment_id):
         Appointment.delete(appointment_id)
         return redirect(reverse('prescription_manager_app:appointment-list'))
 
-    return render(request, 'prescription_manager_app/appointment/confirm_delete.html', {
+    return render(request, 'prescription_manager_app/admin/appointment/confirm_delete.html', {
         'appointment': appointment
     })

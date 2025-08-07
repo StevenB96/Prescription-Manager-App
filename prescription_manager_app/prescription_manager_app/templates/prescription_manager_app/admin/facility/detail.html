@@ -1,0 +1,16 @@
+<!-- templates/prescription_manager_app/admin/facility/detail.html -->
+
+{% extends 'prescription_manager_app/admin/base.html' %}
+{% block title %}Facility Details{% endblock %}
+{% block content %}
+<h1>{{ facility.name }}</h1>
+<ul>
+	<li>Address: {{ facility.address }}</li>
+	<li>Type: {{ facility.get_type_display }}</li>
+	<li>Status: {{ facility.get_status_display }}</li>
+	<li>Created: {{ facility.created_at }}</li>
+	<li>Updated: {{ facility.updated_at }}</li>
+</ul>
+<a href="{% url 'prescription_manager_app:facility-update' facility.id %}">Edit</a> |
+<a href="{% url 'prescription_manager_app:facility-list' %}">Back to list</a>
+{% endblock %}

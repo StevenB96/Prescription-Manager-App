@@ -9,7 +9,7 @@ def user_list(request):
     users = User.list_all()
     return render(
         request, 
-        'prescription_manager_app/user/list.html', 
+        'prescription_manager_app/admin/user/list.html', 
         {
             'users': users
         }
@@ -36,7 +36,7 @@ def user_create(request):
         'status': {'value': ''},
     }
 
-    return render(request, 'prescription_manager_app/user/form.html', {
+    return render(request, 'prescription_manager_app/admin/user/form.html', {
         'form': form_data,
         'role_choices': User.ROLE_CHOICES,
         'status_choices': User.STATUS_CHOICES,
@@ -53,7 +53,7 @@ def user_detail(request, user_id):
     
     return render(
         request, 
-        'prescription_manager_app/user/detail.html', 
+        'prescription_manager_app/admin/user/detail.html', 
         {'user': user}
     )
 
@@ -83,7 +83,7 @@ def user_update(request, user_id):
         'status': {'value': user.status},
     }
 
-    return render(request, 'prescription_manager_app/user/form.html', {
+    return render(request, 'prescription_manager_app/admin/user/form.html', {
         'form': form_data,
         'role_choices': User.ROLE_CHOICES,
         'status_choices': User.STATUS_CHOICES,
@@ -103,6 +103,6 @@ def user_delete(request, user_id):
         return redirect(reverse('prescription_manager_app:user-list'))
 
     return render(request, 
-        'prescription_manager_app/user/confirm_delete.html', 
+        'prescription_manager_app/admin/user/confirm_delete.html', 
         {'user': user}
     )

@@ -9,7 +9,7 @@ def medication_list(request):
     medications = Medication.list_all()
     return render(
         request,
-        'prescription_manager_app/medication/list.html',
+        'prescription_manager_app/admin/medication/list.html',
         {'medications': medications}
     )
 
@@ -34,7 +34,7 @@ def medication_create(request):
         'status': {'value': Medication.STATUS_ACTIVE},
     }
 
-    return render(request, 'prescription_manager_app/medication/form.html', {
+    return render(request, 'prescription_manager_app/admin/medication/form.html', {
         'form': form_data,
         'status_choices': Medication.STATUS_CHOICES,
         'form_title': 'Create Medication',
@@ -49,7 +49,7 @@ def medication_detail(request, medication_id):
 
     return render(
         request,
-        'prescription_manager_app/medication/detail.html',
+        'prescription_manager_app/admin/medication/detail.html',
         {'medication': medication}
     )
 
@@ -79,7 +79,7 @@ def medication_update(request, medication_id):
         'status': {'value': medication.status},
     }
 
-    return render(request, 'prescription_manager_app/medication/form.html', {
+    return render(request, 'prescription_manager_app/admin/medication/form.html', {
         'form': form_data,
         'status_choices': Medication.STATUS_CHOICES,
         'form_title': 'Edit Medication',
@@ -99,6 +99,6 @@ def medication_delete(request, medication_id):
 
     return render(
         request,
-        'prescription_manager_app/medication/confirm_delete.html',
+        'prescription_manager_app/admin/medication/confirm_delete.html',
         {'medication': medication}
     )

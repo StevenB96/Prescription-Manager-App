@@ -87,31 +87,31 @@ def seed_medications():
     return list(medication_col.find({}))
 
 
-def seed_oauth_clients():
-    """Seed the OAuth client collection with web and mobile clients."""
-    oauth_client_col.delete_many({})
-    clients = [
-        {
-            "client_id": "web-client",
-            "client_secret": "supersecret",
-            "redirect_uris": ["http://localhost:8000/callback"],
-            "grant_types": ["authorization_code", "refresh_token"],
-            "response_types": ["code"],
-            "scope": "profile",
-            "token_endpoint_auth_method": "client_secret_basic",
-        },
-        {
-            "client_id": "mobile-client",
-            "client_secret": "mobilesecret",
-            "redirect_uris": ["myapp://oauth-callback"],
-            "grant_types": ["password", "refresh_token"],
-            "response_types": ["token"],
-            "scope": "profile email",
-            "token_endpoint_auth_method": "client_secret_post",
-        }
-    ]
-    oauth_client_col.insert_many(clients)
-    print("Seeded OAuth clients")
+# def seed_oauth_clients():
+#     """Seed the OAuth client collection with web and mobile clients."""
+#     oauth_client_col.delete_many({})
+#     clients = [
+#         {
+#             "client_id": "web-client",
+#             "client_secret": "supersecret",
+#             "redirect_uris": ["http://localhost:8000/callback"],
+#             "grant_types": ["authorization_code", "refresh_token"],
+#             "response_types": ["code"],
+#             "scope": "profile",
+#             "token_endpoint_auth_method": "client_secret_basic",
+#         },
+#         {
+#             "client_id": "mobile-client",
+#             "client_secret": "mobilesecret",
+#             "redirect_uris": ["myapp://oauth-callback"],
+#             "grant_types": ["password", "refresh_token"],
+#             "response_types": ["token"],
+#             "scope": "profile email",
+#             "token_endpoint_auth_method": "client_secret_post",
+#         }
+#     ]
+#     oauth_client_col.insert_many(clients)
+#     print("Seeded OAuth clients")
 
 
 def seed_facilities():
@@ -186,7 +186,7 @@ def seed_prescriptions(users, medications, facilities):
 if __name__ == "__main__":
     users = seed_users()
     medications = seed_medications()
-    seed_oauth_clients()
+    # seed_oauth_clients()
     facilities = seed_facilities()
     seed_appointments(users, facilities)
     seed_prescriptions(users, medications, facilities)

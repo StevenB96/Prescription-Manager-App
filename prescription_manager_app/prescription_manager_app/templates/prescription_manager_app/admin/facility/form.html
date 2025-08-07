@@ -1,0 +1,89 @@
+<!-- templates/prescription_manager_app/admin/facility/form.html -->
+
+{% extends 'prescription_manager_app/admin/base.html' %}
+
+{% block title %}
+{{ form_title }}
+{% endblock %}
+
+{% block content %}
+<h1>{{ form_title }}</h1>
+
+<form method="post">
+	{% csrf_token %}
+
+	<p>
+		<label for="name">Name</label><br>
+		<input
+			type="text"
+			id="name"
+			name="name"
+			value="{{ form.name.value|default:'' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="address">Address</label><br>
+		<input
+			type="text"
+			id="address"
+			name="address"
+			value="{{ form.address.value|default:'' }}"
+			required
+		>
+	</p>
+
+	<p>
+		<label for="type">Type</label><br>
+		<select
+			id="type"
+			name="type"
+			required
+		>
+			{% for code, label in type_choices %}
+			{% if code|stringformat:'s' == form.type.value|stringformat:'s' %}
+			<option
+				value="{{ code }}"
+				selected
+			>{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+
+			{% for code, label in type_choices %}
+			{% if code|stringformat:'s' != form.type.value|stringformat:'s' %}
+			<option value="{{ code }}">{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+	</p>
+
+	<p>
+		<label for="status">Status</label><br>
+		<select
+			id="status"
+			name="status"
+			required
+		>
+
+			{% for code, label in status_choices %}
+			{% if code|stringformat:'s' == form.status.value|stringformat:'s' %}
+			<option
+				value="{{ code }}"
+				selected
+			>{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+
+			{% for code, label in status_choices %}
+			{% if code|stringformat:'s' != form.status.value|stringformat:'s' %}
+			<option value="{{ code }}">{{ label }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+	</p>
+
+	<button type="submit">{{ submit_label }}</button>
+	<a href="{% url 'prescription_manager_app:facility-list' %}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!-- templates/prescription_manager_app/admin/facility/list.html -->
+
+{% extends 'prescription_manager_app/admin/base.html' %}
+{% block title %}Facilities{% endblock %}
+{% block content %}
+<h1>Facilities</h1>
+<a href="{% url 'prescription_manager_app:facility-create' %}">Create New Facility</a>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Address</th>
+			<th>Type</th>
+			<th>Status</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for facility in facilities %}
+		<tr>
+			<td>{{ facility.name }}</td>
+			<td>{{ facility.address }}</td>
+			<td>{{ facility.get_type_display }}</td>
+			<td>{{ facility.get_status_display }}</td>
+			<td>
+				<a href="{% url 'prescription_manager_app:facility-detail' facility.id %}">View</a> |
+				<a href="{% url 'prescription_manager_app:facility-update' facility.id %}">Edit</a> |
+				<a href="{% url 'prescription_manager_app:facility-delete' facility.id %}">Delete</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!-- templates/prescription_manager_app/admin/medication/confirm_delete.html -->
+
+{% extends 'prescription_manager_app/admin/base.html' %}
+{% block title %}Confirm Delete{% endblock %}
+{% block content %}
+<h1>Delete {{ medication.generic_name }}?</h1>
+<form
+	method="post"
+	action="{% url 'prescription_manager_app:medication-delete' medication.id %}"
+>
+	{% csrf_token %}
+	<button type="submit">Yes, delete</button>
+	<a href="{% url 'prescription_manager_app:medication-list' %}">Cancel</a>
+</form>
+{% endblock %}

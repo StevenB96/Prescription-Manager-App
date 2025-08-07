@@ -9,7 +9,7 @@ def facility_list(request):
     facilities = Facility.list_all()
     return render(
         request, 
-        'prescription_manager_app/facility/list.html', 
+        'prescription_manager_app/admin/facility/list.html', 
         {'facilities': facilities}
         )
 
@@ -31,7 +31,7 @@ def facility_create(request):
         'status': {'value': ''},
     }
 
-    return render(request, 'prescription_manager_app/facility/form.html', {
+    return render(request, 'prescription_manager_app/admin/facility/form.html', {
         'form': form_data,
         'type_choices': Facility.TYPE_CHOICES,
         'status_choices': Facility.STATUS_CHOICES,
@@ -44,7 +44,7 @@ def facility_detail(request, facility_id):
     facility = Facility.get(facility_id)
     if not facility:
         return redirect(reverse('prescription_manager_app:facility-list'))
-    return render(request, 'prescription_manager_app/facility/detail.html', {'facility':facility})
+    return render(request, 'prescription_manager_app/admin/facility/detail.html', {'facility':facility})
 
 @require_http_methods(["GET", "POST"])
 def facility_update(request, facility_id):
@@ -69,7 +69,7 @@ def facility_update(request, facility_id):
         'status': {'value': facility.status},
     }
 
-    return render(request, 'prescription_manager_app/facility/form.html', {
+    return render(request, 'prescription_manager_app/admin/facility/form.html', {
         'form': form_data,
         'type_choices': Facility.TYPE_CHOICES,
         'status_choices': Facility.STATUS_CHOICES,
@@ -85,4 +85,4 @@ def facility_delete(request, facility_id):
     if request.method=='POST':
         Facility.delete(facility_id)
         return redirect(reverse('prescription_manager_app:facility-list'))
-    return render(request, 'prescription_manager_app/facility/confirm_delete.html', {'facility':facility})
+    return render(request, 'prescription_manager_app/admin/facility/confirm_delete.html', {'facility':facility})

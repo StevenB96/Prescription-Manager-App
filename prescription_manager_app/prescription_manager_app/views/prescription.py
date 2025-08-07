@@ -11,7 +11,7 @@ def prescription_list(request):
     prescriptions = Prescription.list_all()
     return render(
         request,
-        'prescription_manager_app/prescription/list.html',
+        'prescription_manager_app/admin/prescription/list.html',
         {'prescriptions': prescriptions}
     )
 
@@ -36,7 +36,7 @@ def prescription_create(request):
         'medical_exemption_type': {'value': ''},
         'status': {'value': ''},
     }
-    return render(request, 'prescription_manager_app/prescription/form.html', {
+    return render(request, 'prescription_manager_app/admin/prescription/form.html', {
         'form': form_data,
         'exemption_choices': Prescription.EXEMPTION_CHOICES,
         'status_choices': Prescription.STATUS_CHOICES,
@@ -51,7 +51,7 @@ def prescription_detail(request, prescription_id):
     if not prescription:
         return redirect(reverse('prescription_manager_app:prescription-list'))
 
-    return render(request, 'prescription_manager_app/prescription/detail.html', {
+    return render(request, 'prescription_manager_app/admin/prescription/detail.html', {
         'prescription': prescription
     })
 
@@ -82,7 +82,7 @@ def prescription_update(request, prescription_id):
         'status': {'value': prescription.status},
     }
 
-    return render(request, 'prescription_manager_app/prescription/form.html', {
+    return render(request, 'prescription_manager_app/admin/prescription/form.html', {
         'form': form_data,
         'exemption_choices': Prescription.EXEMPTION_CHOICES,
         'status_choices': Prescription.STATUS_CHOICES,
@@ -101,6 +101,6 @@ def prescription_delete(request, prescription_id):
         Prescription.delete(prescription_id)
         return redirect(reverse('prescription_manager_app:prescription-list'))
 
-    return render(request, 'prescription_manager_app/prescription/confirm_delete.html', {
+    return render(request, 'prescription_manager_app/admin/prescription/confirm_delete.html', {
         'prescription': prescription
     })

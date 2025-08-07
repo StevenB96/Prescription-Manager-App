@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'prescription_manager_app',
+    'oauth_service',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

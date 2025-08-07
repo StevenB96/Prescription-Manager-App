@@ -19,4 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', include('prescription_manager_app.urls')),
+    path('oauth/', include('oauth_service.urls')),
 ]
