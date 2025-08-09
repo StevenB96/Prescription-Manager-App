@@ -185,3 +185,32 @@ mutation {
     }
   }
 }
+
+
+Actors:
+User: The resource owner who wants to grant access to their protected resources.
+
+Client Application: The third-party app requesting access to the user’s resources.
+
+Authorization Server: The server handling user authentication and consent (your OAuth service).
+
+Resource Server: The server hosting the protected resources (not directly involved in authorization step).
+
+The Authorize Step in OAuth2:
+Client Application → User
+The client app redirects the user to the Authorization Server with a request that includes the client_id, requested scopes, and a redirect_uri.
+
+User → Authorization Server
+The user arrives at the authorization server’s consent page (rendered by the authorize view, GET request). Here, the user is asked to log in (if not already) and to approve or deny the client's access request.
+
+User (Action)
+The user reviews the request and decides to approve or deny the access.
+
+User → Authorization Server (POST)
+The user submits the approval form. This triggers the authorize view’s POST handling.
+
+Authorization Server (Action)
+Upon approval, the authorization server generates a short-lived authorization code linked to the user, client, and redirect URI.
+
+Authorization Server → Client Application
+The server redirects the user back to the client’s specified redirect_uri with the authorization code and the original state parameter (if provided).
