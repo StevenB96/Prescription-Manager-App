@@ -1,3 +1,5 @@
+# prescription_manager_app\oauth_service\views.py
+
 import json
 import time
 import secrets
@@ -20,15 +22,15 @@ from prescription_manager_app.utils.auth import (
     is_bcrypt_hash,
 )
 
-# --------------------------
-# 1) register_user view
-# --------------------------
+
+# User registration endpoint
+# Accepts POST with email and password (form or JSON)
+# Creates a new user if email not registered
 @csrf_exempt
 def register_user(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
 
-    # support form-encoded and JSON bodies
     email = request.POST.get("email")
     password = request.POST.get("password")
     if not email or not password:
@@ -56,9 +58,9 @@ def register_user(request):
     return JsonResponse({"message": "User registered successfully"}, status=201)
 
 
-# --------------------------
-# 2) authorize view
-# --------------------------
+# OAuth2 authorization endpoint (requires user login)
+# GET: Render consent page for client app
+# POST: Handle user approval and issue auth code
 @login_required
 def authorize(request):
     if request.method == "GET":
@@ -79,7 +81,7 @@ def authorize(request):
 
         return render(request, "authorize.html", {"client_id": client_id, "redirect_uri": redirect_uri, "state": state})
 
-    # POST -> user approved
+    # POST: user approved the client, generate auth code and redirect back
     user_id = str(request.user.id)
     client_id = request.POST.get("client_id")
     redirect_uri = request.POST.get("redirect_uri")
@@ -105,7 +107,7 @@ def authorize(request):
         "redirect_uri": redirect_uri,
         "user_id": user_id,
         "created_at": int(time.time()),
-        "expires_at": int(time.time()) + 600
+        "expires_at": int(time.time()) + 600  # 10 minutes expiry
     })
 
     sep = "&" if "?" in redirect_uri else "?"
@@ -113,15 +115,15 @@ def authorize(request):
     return redirect(f"{redirect_uri}{sep}code={code}{state_param}")
 
 
-# --------------------------
-# 3) token view
-# --------------------------
+# OAuth2 token endpoint
+# Supports grant_type=password and authorization_code
+# Issues access and refresh tokens on valid requests
 @csrf_exempt
 def token(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=405)
 
-    # support form and JSON
+    # Determine grant type (form or JSON)
     grant_type = request.POST.get("grant_type") or (json.loads(request.body.decode("utf-8") or "{}").get("grant_type") if request.body else None)
 
     if grant_type == "password":
@@ -139,7 +141,6 @@ def token(request):
         if not all([email, password, client_id, client_secret]):
             return JsonResponse({"error": "Missing required fields"}, status=400)
 
-        # validate client
         client = oauth_client_col.find_one({"client_id": client_id})
         if not client or client.get("client_secret") != client_secret:
             return JsonResponse({"error": "Invalid client"}, status=401)
@@ -152,7 +153,7 @@ def token(request):
         if not is_bcrypt_hash(stored_hash) or not verify_bcrypt(password, stored_hash):
             return JsonResponse({"error": "Invalid credentials"}, status=401)
 
-        # issue tokens
+        # Issue tokens
         access_token = secrets.token_urlsafe(32)
         refresh_token = secrets.token_urlsafe(32)
         expires_in = 3600
@@ -226,9 +227,8 @@ def token(request):
         return JsonResponse({"error": "Unsupported grant type"}, status=400)
 
 
-# --------------------------
-# 4) oauth_required decorator + user_info
-# --------------------------
+# Decorator to protect views with OAuth2 token authentication
+# Validates bearer token and token expiration
 def oauth_required(view_func):
     def wrapper(request, *args, **kwargs):
         auth = request.META.get("HTTP_AUTHORIZATION", "")
@@ -242,6 +242,8 @@ def oauth_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
+
+# Protected resource example returning user info
 @oauth_required
 def user_info(request):
     return JsonResponse({"user_id": request.user_id, "message": "Access granted to protected resource"})

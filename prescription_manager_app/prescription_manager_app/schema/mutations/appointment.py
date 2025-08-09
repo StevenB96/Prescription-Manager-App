@@ -1,4 +1,5 @@
-# schema/mutations/appointment.py
+# prescription_manager_app\prescription_manager_app\schema\mutations\appointment.py
+
 import graphene
 from ..types import AppointmentType
 from ...models import Appointment

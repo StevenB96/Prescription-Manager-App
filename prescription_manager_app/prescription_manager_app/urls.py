@@ -1,4 +1,4 @@
-# prescription_manager_app/urls.py
+# prescription_manager_app\prescription_manager_app\urls.py
 
 from django.urls import path
 from . import views

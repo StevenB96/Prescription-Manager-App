@@ -1,4 +1,5 @@
-# schema/types.py
+# prescription_manager_app\prescription_manager_app\schema\types.py
+
 import graphene
 
 class AppointmentType(graphene.ObjectType):

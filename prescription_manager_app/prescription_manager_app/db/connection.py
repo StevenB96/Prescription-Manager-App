@@ -1,3 +1,5 @@
+# prescription_manager_app\prescription_manager_app\db\connection.py
+
 from pymongo import MongoClient
 
 # Connect to MongoDB (adjust URI as needed)

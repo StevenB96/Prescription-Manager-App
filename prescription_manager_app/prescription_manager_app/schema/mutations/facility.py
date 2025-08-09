@@ -1,4 +1,5 @@
-# schema/mutations/facility.py
+# prescription_manager_app\prescription_manager_app\schema\mutations\facility.py
+
 import graphene
 from ..types import FacilityType
 from ...models import Facility

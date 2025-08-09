@@ -1,4 +1,5 @@
-# schema/schema.py
+# prescription_manager_app\prescription_manager_app\schema\schema.py
+
 import graphene
 from .queries.appointment import AppointmentQuery
 from .queries.facility import FacilityQuery

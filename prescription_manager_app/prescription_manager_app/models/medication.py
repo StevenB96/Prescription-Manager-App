@@ -1,3 +1,5 @@
+# prescription_manager_app\prescription_manager_app\models\medication.py
+
 from bson.objectid import ObjectId
 from datetime import datetime
 from prescription_manager_app.db.connection import medication_col

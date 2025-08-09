@@ -1,3 +1,5 @@
+# prescription_manager_app\oauth_service\urls.py
+
 from django.urls import path
 from . import views
 

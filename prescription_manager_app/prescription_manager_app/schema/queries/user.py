@@ -1,4 +1,5 @@
-# schema/queries/user.py
+# prescription_manager_app\prescription_manager_app\schema\queries\user.py
+
 import graphene
 from ..types import UserType
 from ...models import User

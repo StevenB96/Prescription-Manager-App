@@ -1,4 +1,5 @@
-# schema/queries/prescription.py
+# prescription_manager_app\prescription_manager_app\schema\queries\prescription.py
+
 import graphene
 from ..types import PrescriptionType
 from ...models import Prescription

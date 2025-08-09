@@ -1,3 +1,5 @@
+# prescription_manager_app\oauth_service\scripts\seed.py
+
 import os
 import sys
 
