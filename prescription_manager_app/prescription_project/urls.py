@@ -18,7 +18,7 @@ Including another URLconf
 """
 from django.urls import path, include
 from graphene_django.views import GraphQLView
-from prescription_manager_app.schema import schema
+from prescription_manager_app.schema.schema import schema
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
@@ -30,7 +30,7 @@ urlpatterns = [
         include('oauth_service.urls')
     ),
     path(
-        "graphql/", 
-        csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))
+        "graphql/",
+        csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)),
     ),
 ]

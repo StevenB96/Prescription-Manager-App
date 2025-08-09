@@ -20,17 +20,6 @@ urlpatterns = [
           views.auth.login, 
           name='login'),
 
-#     # OAuth2
-#     path('authorize/', 
-#          views.auth.authorize, 
-#          name='authorize'),
-#     path('token/', 
-#          views.auth.token, 
-#          name='token'),
-#     path('api/profile/', 
-#          views.auth.api_profile, 
-#          name='api-profile'),
-
     # Users CRUD
     path('admin/users/', 
          views.user.user_list, 
