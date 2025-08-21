@@ -28,20 +28,40 @@ class Command(BaseCommand):
                 "redirect_uris": ["http://localhost:8000/callback"],
 
                 # The grant types this client is allowed to use.
-                # "authorization_code" is used for standard web app flows.
-                # "refresh_token" allows the client to obtain new access tokens without user interaction.
-                "grant_types": ["authorization_code", "refresh_token"],
+                # Common options include:
+                # - "authorization_code": Standard web app flow where the client exchanges a code for a token.
+                # - "refresh_token": Allows obtaining new access tokens without user interaction.
+                # - "client_credentials": For server-to-server authentication without user involvement.
+                # - "password" (Resource Owner Password Credentials): Directly uses user credentials (less secure, not recommended).
+                "grant_types": ["authorization_code", "refresh_token", "client_credentials", "password"],
 
                 # The types of responses the client expects from the authorization server.
-                # "code" corresponds to the authorization code flow.
-                "response_types": ["code"],
+                # Common options include:
+                # - "code": Authorization code flow (most secure for web apps).
+                # - "token": Implicit flow, where the access token is returned directly (used in SPA / front-end apps; less secure).
+                # - "id_token": For OpenID Connect, returns an ID token containing user identity information.
+                # - "code id_token": Hybrid flow combining code and id_token for immediate identity and token.
+                "response_types": ["code", "token", "id_token", "code id_token"],
 
                 # The scopes that the client can request access to.
-                # "profile" typically includes basic user information like name and email.
+                # Scopes define what resources or permissions the client is allowed to access.
+                # Common scopes include:
+                # - "profile": Basic user information such as name, username, and email.
+                # - "email": Access to the user's email address.
+                # - "openid": Required for OpenID Connect to request identity tokens.
+                # - "offline_access": Allows requesting refresh tokens.
+                # - "read", "write", "admin": Custom scopes for API-specific permissions.
                 "scope": "profile",
 
                 # Authentication method the client uses at the token endpoint.
-                # "client_secret_basic" means the client sends client_id and client_secret in the Authorization header.
+                # This determines how the client proves its identity when requesting tokens.
+                # Common options include:
+                # - "client_secret_basic": Client sends client_id and client_secret in the HTTP Authorization header (most common).
+                # - "client_secret_post": Client sends client_id and client_secret in the POST body.
+                # - "client_secret_jwt": Client signs a JWT with its secret and sends it for authentication.
+                # - "private_key_jwt": Client signs a JWT using a private key (more secure, used in confidential clients).
+                # - "none": Public clients that cannot keep a secret (used for SPAs or mobile apps with PKCE).
+                # alternatives: client_secret_post, client_secret_jwt, private_key_jwt, none
                 "token_endpoint_auth_method": "client_secret_basic",
 
                 # Timestamp for when the client was created.
