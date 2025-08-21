@@ -130,3 +130,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 GRAPHENE = {
     "SCHEMA": "prescription_manager_app.schema.schema",
 }
+
+OAUTH_BASE = "http://localhost:8000/oauth"
+EXTERNAL_OAUTH_CLIENT_ID = "external"
+EXTERNAL_OAUTH_CLIENT_SECRET = "59d8f3ec5b13131f7856e6ed51dca3c6adb97cd4"
+INTERNAL_OAUTH_CLIENT_ID = "internal"
+INTERNAL_OAUTH_CLIENT_SECRET = "9f33a7c798af6fd6abb28049d9c1b3edfa2fd24a"

@@ -22,11 +22,11 @@ from prescription_manager_app.schema.schema import schema
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    path('', 
-        include('prescription_manager_app.urls')
-    ),
+    path('',
+         include('prescription_manager_app.urls')
+         ),
     path(
-        'oauth/', 
+        'oauth/',
         include('oauth_service.urls')
     ),
     path(
