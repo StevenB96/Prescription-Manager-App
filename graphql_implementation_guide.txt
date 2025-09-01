@@ -201,13 +201,13 @@ Client Application → User
 The client app redirects the user to the Authorization Server with a request that includes the client_id, requested scopes, and a redirect_uri.
 
 User → Authorization Server
-The user arrives at the authorization server’s consent page (rendered by the authorize view, GET request). Here, the user is asked to log in (if not already) and to approve or deny the client's access request.
+The user arrives at the authorization server’s consent page (rendered by the authorise view, GET request). Here, the user is asked to log in (if not already) and to approve or deny the client's access request.
 
 User (Action)
 The user reviews the request and decides to approve or deny the access.
 
 User → Authorization Server (POST)
-The user submits the approval form. This triggers the authorize view’s POST handling.
+The user submits the approval form. This triggers the authorise view’s POST handling.
 
 Authorization Server (Action)
 Upon approval, the authorization server generates a short-lived authorization code linked to the user, client, and redirect URI.

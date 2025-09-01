@@ -26,9 +26,9 @@ urlpatterns = [
     #          name='logout'),
 
     #     # OAuth2
-    #     path('authorize/',
-    #          views.auth.authorize,
-    #          name='authorize'),
+    #     path('authorise/',
+    #          views.auth.authorise,
+    #          name='authorise'),
     #     path('token/',
     #          views.auth.token,
     #          name='token'),

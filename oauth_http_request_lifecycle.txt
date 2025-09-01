@@ -1,0 +1,193 @@
+========================================
+OAuth2 HTTP Request Lifecycle Guide for Django Simulation (.txt)
+========================================
+
+This guide details the step-by-step HTTP request lifecycle for a standard OAuth2 Authorization Code flow, including token refresh, revocation, and deauthorization, simulating a normal OAuth scenario between two Django apps in the same project.
+
+--- Cast of Characters ---
+*   User: Alice, who has an account on the oauth_service.
+*   Authorization Server: `oauth_service`, your Django application (http://localhost:8000).
+*   Client Application: `prescription_manager_app`, another Django app in the project.
+    *   client_id: presc_man_123
+    *   redirect_uri: http://127.0.0.1:5000/callback
+
+********************************************************************************
+STEP 1: The User Initiates Authorization
+********************************************************************************
+Alice is using the `prescription_manager_app` and clicks "Connect to OAuth Service." Her browser is redirected to the `oauth_service`'s /authorise endpoint.
+
+[Alice's Browser] ---> [oauth_service]
+
+--- [REQUEST] ---
+GET /authorise/?response_type=code&client_id=presc_man_123&redirect_uri=http%3A%2F%2F127.0.0.1%3A5000%2Fcallback&scope=user%20profile&state=xyzABC123 HTTP/1.1
+Host: localhost:8000
+-----------------
+
+
+********************************************************************************
+STEP 2: User Authenticates and Grants Consent
+********************************************************************************
+The `oauth_service`, seeing Alice isn't logged in, first presents a login page. After she logs in, the server renders the consent page. Alice clicks "Allow."
+
+[Alice's Browser] ---> [oauth_service]
+
+--- [REQUEST] ---
+POST /authorise/ HTTP/1.1
+Host: localhost:8000
+Content-Type: application/x-www-form-urlencoded
+
+client_id=presc_man_123&redirect_uri=http%3A%2F%2F127.0.0.1%3A5000%2Fcallback&scope=user%20profile&state=xyzABC123
+-----------------
+
+
+********************************************************************************
+STEP 3: Server Issues Authorization Code
+********************************************************************************
+The `oauth_service` validates the consent, generates a temporary authorization code, and redirects Alice's browser back to the `prescription_manager_app`.
+
+[oauth_service] ---> [Alice's Browser]
+
+--- [RESPONSE] ---
+HTTP/1.1 302 Found
+Location: http://127.0.0.1:5000/callback?code=SPL__a-Random-UrlSafe-String-1234&state=xyzABC123
+------------------
+
+
+********************************************************************************
+STEP 4: Client Exchanges Code for Tokens
+********************************************************************************
+The `prescription_manager_app`'s backend extracts the 'code' and makes a secure, server-to-server request to the `/token` endpoint.
+
+[prescription_manager_app Server] ---> [oauth_service]
+
+--- [REQUEST] ---
+POST /token/ HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+
+{
+    "grant_type": "authorization_code",
+    "code": "SPL__a-Random-UrlSafe-String-1234",
+    "redirect_uri": "http://127.0.0.1:5000/callback",
+    "client_id": "presc_man_123",
+    "client_secret": "ITS_A_VERY_SECRET_KEY"
+}
+-----------------
+
+
+********************************************************************************
+STEP 5: Server Responds with Tokens
+********************************************************************************
+The `oauth_service` validates the code, then deletes it and issues access and refresh tokens.
+
+[oauth_service] ---> [prescription_manager_app Server]
+
+--- [RESPONSE] ---
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "access_token": "AT_ANOTHER_RANDOM_SECURE_TOKEN_STRING",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "refresh_token": "RT_A_DIFFERENT_RANDOM_SECURE_TOKEN_STRING",
+    "scope": "user profile"
+}
+------------------
+
+
+********************************************************************************
+STEP 6: Client Accesses a Protected Resource
+********************************************************************************
+The `prescription_manager_app` uses the access token to request Alice's data from a protected API endpoint.
+
+[prescription_manager_app Server] ---> [oauth_service]
+
+--- [REQUEST] ---
+GET /userinfo/ HTTP/1.1
+Host: localhost:8000
+Authorization: Bearer AT_ANOTHER_RANDOM_SECURE_TOKEN_STRING
+-----------------
+
+
+********************************************************************************
+STEP 7: Client Refreshes the Access Token
+********************************************************************************
+After the access token expires, the client uses the refresh token to get a new set of tokens without user interaction.
+
+[prescription_manager_app Server] ---> [oauth_service]
+
+--- [REQUEST] ---
+POST /token/ HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+
+{
+    "grant_type": "refresh_token",
+    "refresh_token": "RT_A_DIFFERENT_RANDOM_SECURE_TOKEN_STRING",
+    "client_id": "presc_man_123",
+    "client_secret": "ITS_A_VERY_SECRET_KEY"
+}
+-----------------
+
+
+********************************************************************************
+STEP 8: User Revokes Access
+********************************************************************************
+Alice decides she no longer wants the `prescription_manager_app` to have access. There are two primary ways to do this, which use distinct endpoints.
+
+--- SCENARIO A: Logout from within the Client App (Token Revocation) ---
+Alice clicks "Logout" in the `prescription_manager_app`. The app's backend should call the `/oauth/revoke/` endpoint to invalidate the specific token, effectively logging her out.
+
+--- SCENARIO B: Deauthorization from the Authorization Server ---
+Alice logs into the `oauth_service` directly, navigates to her "Manage Connected Apps" settings page, and clicks "Revoke Access" for the `prescription_manager_app`. This form submission calls the `/oauth/deauthorise/` endpoint to sever the entire connection.
+
+
+********************************************************************************
+STEP 9: Revocation and Deauthorization Endpoints
+********************************************************************************
+
+--- Endpoint 1: Token Revocation ---
+This endpoint invalidates a single access token or refresh token. It is defined by RFC 7009 and is used for actions like "logout."
+
+[prescription_manager_app Server] ---> [oauth_service]
+
+--- [REQUEST] ---
+POST /oauth/revoke/ HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+
+{
+    "token": "AT_THE_CURRENT_ACTIVE_ACCESS_TOKEN",
+    "client_id": "presc_man_123",
+    "client_secret": "ITS_A_VERY_SECRET_KEY"
+}
+-----------------
+--- [ACTION] ---
+The server finds the token, verifies it belongs to the client, and deletes or invalidates it. If a refresh token is revoked, its corresponding access tokens are also revoked.
+-----------------
+--- [RESPONSE] ---
+HTTP/1.1 200 OK
+-----------------
+
+
+--- Endpoint 2: Application Deauthorization ---
+This is a custom endpoint on the authorization server that severs the entire link between a user and a client application.
+
+[Alice's Browser] ---> [oauth_service]
+
+--- [REQUEST] ---
+POST /oauth/deauthorise/ HTTP/1.1
+Host: localhost:8000
+Content-Type: application/x-www-form-urlencoded
+Cookie: sessionid=...
+
+client_id=presc_man_123
+-----------------
+--- [ACTION] ---
+The server identifies the user from the session cookie. It finds and deletes ALL access and refresh tokens associated with that user's ID AND the provided `client_id`.
+-----------------
+--- [RESPONSE] ---
+HTTP/1.1 302 Found
+Location: /manage-apps/
+-----------------

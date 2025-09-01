@@ -1,0 +1,41 @@
+{% extends "oauth_service/base.html" %}
+
+{% block title %}Grant Access{% endblock %}
+
+{% block content %}
+    <style>
+        .authorise-container { text-align: center; }
+        .client-name { font-weight: bold; font-size: 1.2em; color: #0056b3; }
+        .permissions { list-style: none; padding: 0; margin: 20px 0; }
+        .permissions li { background-color: #e9ecef; padding: 8px; border-radius: 4px; margin-bottom: 5px; }
+        .button-group { display: flex; justify-content: space-around; margin-top: 25px; }
+        .button-group button { padding: 10px 20px; font-size: 1em; width: 120px; }
+    </style>
+
+    <div class="authorise-container">
+        <h1>Authorize Application</h1>
+        <p>
+            The application <span class="client-name">{{ client.client_name }}</span> would like to access your account.
+        </p>
+
+        <p>It is requesting the following permissions:</p>
+        <ul class="permissions">
+            {% for s in scope.split %}
+                <li>{{ s }}</li>
+            {% endfor %}
+        </ul>
+
+        <form method="post" action="{% url 'oauth_service:authorise' %}">
+            {% csrf_token %}
+            <input type="hidden" name="client_id" value="{{ client.client_id }}">
+            <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+            <input type="hidden" name="scope" value="{{ scope }}">
+            <input type="hidden" name="state" value="{{ state }}">
+            
+            <div class="button-group">
+                <button type="submit" name="allow" class="btn-primary">Allow</button>
+                <button type="button" onclick="location.href='{{ redirect_uri }}?error=access_denied&state={{ state }}';" class="btn-danger">Deny</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

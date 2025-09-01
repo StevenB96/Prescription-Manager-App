@@ -38,7 +38,7 @@ prescription_manager_app/
         │   ├── form.html
         │   └── list.html
         ├── auth/
-        │   ├── authorize.html
+        │   ├── authorise.html
         │   ├── login.html
         │   └── register.html
         ├── facility/
