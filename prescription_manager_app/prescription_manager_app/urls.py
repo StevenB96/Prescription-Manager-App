@@ -14,14 +14,6 @@ def home(request):
 urlpatterns = [
     path('admin', home, name='home'),
 
-    #     # Auth
-    #     path('register/',
-    #          views.auth.register,
-    #          name='register'),
-    #     path('login/',
-    #          views.auth.login,
-    #          name='login'),
-
     # Users CRUD
     path('admin/users/',
          views.user.user_list,

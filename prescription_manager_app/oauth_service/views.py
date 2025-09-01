@@ -29,7 +29,7 @@ AUTH_CODE_LIFETIME = 600  # seconds
 # --- Helper Functions ---
 
 
-def to_scope_list(value):
+def _convert_options_to_list(value):
     """
     Return a list of scope tokens from value which may be:
       - string: whitespace-separated tokens -> split()
@@ -64,7 +64,7 @@ def _authenticate_client(request):
     Authenticates an OAuth client using Basic Auth or by checking post body parameters.
     Returns the client document if authentication is successful, otherwise None.
     """
-    auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+    auth_header = request.META.get("HTTP_AUThorisation", "")
     post_data = _parse_request_body(request)
 
     client_id = post_data.get("client_id")
@@ -99,7 +99,7 @@ def oauth_required(view_func):
     Attaches 'user_id' and 'scope' to the request object.
     """
     def wrapper(request, *args, **kwargs):
-        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        auth_header = request.META.get("HTTP_AUThorisation", "")
         if not auth_header.startswith("Bearer "):
             return JsonResponse({"error": "Unauthorised: Missing Bearer token"}, status=401)
 
@@ -117,44 +117,30 @@ def oauth_required(view_func):
 # --- Public Endpoints ---
 
 
-# @csrf_exempt
-# def register_user(request):
-#     """
-#     Handles user registration. Supports GET for showing the form and POST for submission.
-#     """
-#     if request.method == "GET":
-#         return render(request, "oauth_service/register.html")
-#     if request.method != "POST":
-#         return JsonResponse({"error": "Method Not Allowed: POST required"}, status=405)
-
-#     data = _parse_request_body(request)
-#     email, password = data.get("email"), data.get("password")
-
-#     if not email or not password:
-#         return JsonResponse({"error": "Bad Request: Missing email or password"}, status=400)
-#     if user_col.find_one({"email": email}):
-#         return JsonResponse({"error": "Conflict: Email already registered"}, status=409)
-
-#     user_col.insert_one({
-#         "email": email,
-#         "password_hash": hash_password_bcrypt(password),
-#         "created_at": datetime.utcnow(),
-#         "updated_at": datetime.utcnow()
-#     })
-#     return JsonResponse({"message": "User registered successfully"}, status=201)
-
-
 @csrf_exempt
 def authorise(request):
     """
-    Handles the authorization code grant flow's authorization step.
+    Handles the authorisation code grant flow's authorisation step.
     Displays a consent page (GET) or processes user consent (POST).
     """
-    client_id = request.GET.get("client_id")
-    redirect_uri = request.GET.get("redirect_uri")
-    response_type = request.GET.get("response_type", "code")
-    scope = request.GET.get("scope", "")
-    state = request.GET.get("state")
+    # Read params: prefer POST (form) when present, otherwise fall back to GET
+    if request.method == "POST":
+        # returns plain dict for JSON or form data
+        data = _parse_request_body(request)
+        client_id = data.get("client_id") or request.GET.get("client_id")
+        redirect_uri = data.get(
+            "redirect_uri") or request.GET.get("redirect_uri")
+        response_type = data.get("response_type") or request.GET.get(
+            "response_type", "code")
+        scope = data.get("scope") or request.GET.get("scope", "")
+        state = data.get("state") or request.GET.get("state")
+    else:
+        # GET (display consent)
+        client_id = request.GET.get("client_id")
+        redirect_uri = request.GET.get("redirect_uri")
+        response_type = request.GET.get("response_type", "code")
+        scope = request.GET.get("scope", "")
+        state = request.GET.get("state")
 
     client = oauth_client_col.find_one({"client_id": client_id})
     if not client:
@@ -164,8 +150,8 @@ def authorise(request):
     if response_type not in client.get("response_types", []):
         return JsonResponse({"error": "Unsupported response_type"}, status=400)
 
-    client_scopes = set(to_scope_list(client.get("scope")))
-    requested_scopes = set(to_scope_list(scope))
+    client_scopes = set(_convert_options_to_list(client.get("scope")))
+    requested_scopes = set(_convert_options_to_list(scope))
     if not requested_scopes.issubset(client_scopes):
         return JsonResponse({"error": "Invalid scope"}, status=400)
 
@@ -177,11 +163,6 @@ def authorise(request):
             "scope": scope,
             "redirect_uri": redirect_uri
         })
-
-    # Assuming user is logged in (Django's auth_login should handle this)
-    if not request.user.is_authenticated:
-        # Depending on app design, might redirect to login page instead
-        return JsonResponse({"error": "Unauthorised: User not logged in"}, status=401)
 
     # User submits consent form (POST request)
     code = secrets.token_urlsafe(24)
@@ -195,7 +176,7 @@ def authorise(request):
         "expires_at": int(time.time()) + AUTH_CODE_LIFETIME,
     })
 
-    # Redirect back to client with authorization code
+    # Redirect back to client with authorisation code
     sep = "&" if "?" in redirect_uri else "?"
     state_param = f"&state={state}" if state else ""
     return redirect(f"{redirect_uri}{sep}code={code}{state_param}")
@@ -204,7 +185,7 @@ def authorise(request):
 @csrf_exempt
 def token(request):
     """
-    Handles the token endpoint for exchanging authorization codes,
+    Handles the token endpoint for exchanging authorisation codes,
     refresh tokens, and password credentials for access tokens.
     """
     if request.method != "POST":
@@ -223,14 +204,14 @@ def token(request):
     user_id, scope = None, None
     current_time = int(time.time())
 
-    # Grant Type: Authorization Code
-    if grant_type == "authorization_code":
+    # Grant Type: Authorisation Code
+    if grant_type == "authorisation_code":
         code, redirect_uri = data.get("code"), data.get("redirect_uri")
         auth_code = oauth_code_col.find_one_and_delete(
             {"code": code, "client_id": client["client_id"]}
         )
         if not auth_code or auth_code.get("redirect_uri") != redirect_uri or auth_code.get("expires_at", 0) < current_time:
-            return JsonResponse({"error": "Invalid, mismatched, or expired authorization code"}, status=400)
+            return JsonResponse({"error": "Invalid, mismatched, or expired authorisation code"}, status=400)
         user_id, scope = auth_code["user_id"], auth_code.get("scope")
 
     # Grant Type: Refresh Token

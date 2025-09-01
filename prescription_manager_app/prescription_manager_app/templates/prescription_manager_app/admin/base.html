@@ -37,6 +37,12 @@
 		<a href="{% url 'prescription_manager_app:appointment-list' %}">Appointments</a>
 	</nav>
 	<hr>
-	{% block content %}{% endblock %}
+	{% block content %}
+	<section style="max-width:900px;margin:32px auto;padding:24px;background:#fff;border:1px solid #e6e6e6;border-radius:6px;text-align:center;">
+      <h2 style="margin:0 0 8px 0;color:#333;">Welcome to Prescription Manager</h2>
+      <p style="margin:0 0 12px;color:#666;">Select an item from the navigation to get started.</p>
+      <p style="font-size:.9rem;color:#999;">(This is placeholder content in the base template.)</p>
+    </section>
+	{% endblock %}
 </body>
 </html>
