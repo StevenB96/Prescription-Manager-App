@@ -7,8 +7,12 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
+
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User
 
 from oauth_service.db.connection import (
     oauth_client_col,
@@ -113,6 +117,88 @@ def oauth_required(view_func):
         request.scope = token_data.get("scope", "").split()
         return view_func(request, *args, **kwargs)
     return wrapper
+
+# --- User Account Management ---
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def register_user(request):
+    """
+    Handles user registration (email + password).
+    Stores hashed password in Mongo and Django's User model for session login.
+    """
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if not email or not password:
+            return render(request, "oauth_service/register.html", {
+                "error": "Email and password are required."
+            })
+
+        # Check if user already exists (Mongo)
+        existing_user = user_col.find_one({"email": email})
+        if existing_user:
+            return render(request, "oauth_service/register.html", {
+                "error": "An account with this email already exists."
+            })
+
+        # Hash password & insert into Mongo
+        password_hash = hash_password_bcrypt(password)
+        user_doc = {
+            "email": email,
+            "password_hash": password_hash,
+            "created_at": datetime.utcnow(),
+            "is_active": True,
+        }
+        result = user_col.insert_one(user_doc)
+
+        # Create matching Django user (for session auth)
+        django_user = User.objects.create_user(
+            username=email, email=email, password=password
+        )
+        auth_login(request, django_user)
+
+        return redirect("oauth_service:manage-apps")
+
+    return render(request, "oauth_service/register.html")
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def login_user(request):
+    """
+    Handles user login via email + password.
+    Authenticates against Mongo and Django’s User model.
+    """
+    if request.method == "POST":
+        email = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user_doc = user_col.find_one({"email": email})
+        if not user_doc or not verify_bcrypt(password, user_doc.get("password_hash", "")):
+            return render(request, "oauth_service/login.html", {
+                "form": {"errors": True}
+            })
+
+        # Authenticate Django session user
+        django_user = authenticate(request, username=email, password=password)
+        if django_user:
+            auth_login(request, django_user)
+            return redirect("oauth_service:manage-apps")
+
+        return render(request, "oauth_service/login.html", {
+            "form": {"errors": True}
+        })
+
+    return render(request, "oauth_service/login.html")
+
+
+def logout_user(request):
+    """Logs out the user from Django session."""
+    auth_logout(request)
+    return redirect("oauth_service:login-user")
 
 # --- Public Endpoints ---
 

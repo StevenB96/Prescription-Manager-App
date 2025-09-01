@@ -8,8 +8,9 @@ app_name = 'oauth_service'
 
 urlpatterns = [
     # User Account Management
-    # path('register/', views.register_user, name='register'),
-    # path('login/', views.login_user, name='login'),  # <--- Add this line
+    path('register/', views.register_user, name='register-user'),
+    path('login/', views.login_user, name='login-user'),
+    path('logout/', views.logout_user, name='logout-user'),
 
     # OAuth2 Core Protocol Endpoints
     path('authorise/', views.authorise, name='authorise'),
@@ -26,3 +27,8 @@ urlpatterns = [
     # Token Management
     path('revoke/', views.revoke_token, name='revoke-token'),
 ]
+
+# OAuth flow: Client (app w/ client_id & secret) asks Auth Server for access.
+# User logs in -> server returns short-lived code.
+# Client exchanges code (+ credentials) for token(s).
+# Token = credential to access user resources (access token, refresh token).
