@@ -3,25 +3,38 @@
 {% block title %}Login - OAuth Service{% endblock %}
 
 {% block content %}
-    <h1>Login to Your Account</h1>
+<h1>Login to Your Account</h1>
 
-    {% if form.errors %}
-        <p style="color: red; text-align: center;">Your username and password didn't match. Please try again.</p>
+<form method="post" action="{% url 'oauth_service:login-user' %}">
+    {% csrf_token %}
+
+    {# Render non-field errors #}
+    {% if form.non_field_errors %}
+        <div style="color: red;">
+            {{ form.non_field_errors }}
+        </div>
     {% endif %}
 
-    <form method="post" action="{% url 'oauth_service:login-user' %}">
-        {% csrf_token %}
-        
-        <label for="username">Email:</label>
-        <input type="text" name="username" id="username" required>
-
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
-
-        <button type="submit" class="btn-primary">Login</button>
-    </form>
-
-    <div class="footer-link">
-        <p>Don't have an account? <a href="{% url 'oauth_service:register-user' %}">Register here</a>.</p>
+    <div>
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div style="color: red;">{{ form.username.errors }}</div>
+        {% endif %}
     </div>
+
+    <div>
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div style="color: red;">{{ form.password.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn-primary">Login</button>
+</form>
+
+<div class="footer-link">
+    <p>Don't have an account? <a href="{% url 'oauth_service:register-user' %}">Register here</a>.</p>
+</div>
 {% endblock %}

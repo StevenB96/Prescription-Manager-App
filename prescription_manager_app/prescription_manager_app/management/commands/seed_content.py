@@ -1,6 +1,5 @@
-# prescription_manager_app/management/commands/seed_data.py
-
 import random
+import secrets
 from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
@@ -11,7 +10,7 @@ from prescription_manager_app.db.connection import (
     prescription_col,
     facility_col,
 )
-from prescription_manager_app.utils.auth import hash_password_bcrypt
+from global_utils.auth import hash_password_bcrypt
 
 
 class Command(BaseCommand):
@@ -43,10 +42,12 @@ class Command(BaseCommand):
                 "username": name,
                 "email": f"{name}@example.com",
                 "password_hash": hash_password_bcrypt("test1234"),
+                "session_salt": secrets.token_hex(16),
                 "role": role_map[role_name],
                 "status": random.randint(0, 2),
                 "created_at": now,
                 "updated_at": now,
+                "last_logged_in": None,
             })
         user_col.insert_many(docs)
         self.stdout.write(self.style.SUCCESS("-> Seeded users"))

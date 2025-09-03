@@ -3,21 +3,38 @@
 {% block title %}Register - OAuth Service{% endblock %}
 
 {% block content %}
-    <h1>Create a New Account</h1>
+<h1>Create a New Account</h1>
 
-    <form method="post" action="{% url 'oauth_service:register-user' %}">
-        {% csrf_token %}
-        
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required>
+<form method="post" action="{% url 'oauth_service:register-user' %}">
+    {% csrf_token %}
 
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
+    {# Render form errors (non-field errors like duplicate email) #}
+    {% if form.non_field_errors %}
+        <div class="error" style="color: red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
 
-        <button type="submit" class="btn-success">Register</button>
-    </form>
-
-    <div class="footer-link">
-        <p>Already have an account? <a href="{% url 'oauth_service:login-user' %}">Login here</a>.</p>
+    <div>
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {% if form.email.errors %}
+            <div style="color: red;">{{ form.email.errors }}</div>
+        {% endif %}
     </div>
+
+    <div>
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div style="color: red;">{{ form.password.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn-success">Register</button>
+</form>
+
+<div class="footer-link">
+    <p>Already have an account? <a href="{% url 'oauth_service:login-user' %}">Login here</a>.</p>
+</div>
 {% endblock %}

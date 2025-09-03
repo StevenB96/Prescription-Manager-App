@@ -9,7 +9,8 @@ def hash_password_bcrypt(raw_password: str) -> str:
     """Return bcrypt hash string for storage."""
     if not isinstance(raw_password, str):
         raise TypeError("raw_password must be a string")
-    hashed = bcrypt.hashpw(raw_password.encode("utf-8"), bcrypt.gensalt(rounds=BCRYPT_ROUNDS))
+    hashed = bcrypt.hashpw(raw_password.encode(
+        "utf-8"), bcrypt.gensalt(rounds=BCRYPT_ROUNDS))
     return hashed.decode("utf-8")
 
 

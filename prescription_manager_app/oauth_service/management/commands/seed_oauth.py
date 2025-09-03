@@ -26,7 +26,9 @@ class Command(BaseCommand):
                 # After successful authorization, the user is redirected to one of these URLs.
                 # Ensures that tokens are only sent to trusted locations.
                 "redirect_uris": [
-                    "http://localhost:8000/admin"
+                    "http://localhost:8000/admin",
+                    "http://localhost:8000/oauth",
+                    "http://localhost:8000/oauth/manage-apps"
                 ],
 
                 # The grant types this client is allowed to use.
@@ -38,7 +40,6 @@ class Command(BaseCommand):
                 "grant_types": [
                     "authorization_code",
                     "refresh_token",
-                    "password",
                 ],
 
                 # The types of responses the client expects from the authorization server.
@@ -49,7 +50,6 @@ class Command(BaseCommand):
                 # - "code id_token": Hybrid flow combining code and id_token for immediate identity and token.
                 "response_types": [
                     "code",
-                    "token",
                 ],
 
                 # The scopes that the client can request access to.
@@ -60,8 +60,12 @@ class Command(BaseCommand):
                 # - "openid": Required for OpenID Connect to request identity tokens.
                 # - "offline_access": Allows requesting refresh tokens.
                 # - "read", "write", "admin", "user": Custom scopes for API-specific permissions.
-                "scope": [
-                    "user"
+                "scopes": [
+                    "facility",
+                    "user",
+                    "medication",
+                    "prescription",
+                    "appointment",
                 ],
 
                 # Authentication method the client uses at the token endpoint.
@@ -73,9 +77,8 @@ class Command(BaseCommand):
                 # - "private_key_jwt": Client signs a JWT using a private key (more secure, used in confidential clients).
                 # - "none": Public clients that cannot keep a secret (used for SPAs or mobile apps with PKCE).
                 # alternatives: client_secret_post, client_secret_jwt, private_key_jwt, none
-                "token_endpoint_auth_method": [
+                "token_endpoint_auth_methods": [
                     "client_secret_basic",
-                    "client_secret_post",
                 ],
 
                 # Timestamp for when the client was created.

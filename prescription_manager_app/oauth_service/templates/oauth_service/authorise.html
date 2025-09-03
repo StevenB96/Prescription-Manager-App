@@ -13,7 +13,7 @@
     </style>
 
     <div class="authorise-container">
-        <h1>Authorize Application</h1>
+        <h1>Authorise Application</h1>
         <p>
             The application <span class="client-name">{{ client.client_name }}</span> would like to access your account.
         </p>
@@ -27,14 +27,15 @@
 
         <form method="post" action="{% url 'oauth_service:authorise' %}">
             {% csrf_token %}
-            <input type="hidden" name="client_id" value="{{ client.client_id }}">
-            <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
-            <input type="hidden" name="scope" value="{{ scope }}">
-            <input type="hidden" name="state" value="{{ state }}">
-            
+            <input type="hidden" name="client_id" value="{{ form.client_id.value }}">
+            <input type="hidden" name="redirect_uri" value="{{ form.redirect_uri.value }}">
+            <input type="hidden" name="response_type" value="{{ form.response_type.value }}">
+            <input type="hidden" name="scope" value="{{ form.scope.value }}">
+            <input type="hidden" name="state" value="{{ form.state.value }}">
+
             <div class="button-group">
                 <button type="submit" name="allow" class="btn-primary">Allow</button>
-                <button type="button" onclick="location.href='{{ redirect_uri }}?error=access_denied&state={{ state }}';" class="btn-danger">Deny</button>
+                <button type="submit" name="deny" class="btn-danger">Deny</button>
             </div>
         </form>
     </div>

@@ -18,10 +18,26 @@
         <ul class="app-list">
             {% for client in clients %}
                 <li class="app-item">
-                    <span class="app-name">{{ client.client_name }}</span>
-                    <form method="post" action="{% url 'oauth_service:deauthorise-client' %}" onsubmit="return confirm('Are you sure you want to revoke all access for {{ client.client_name }}?');">
+                    <div class="app-info">
+                        <span class="app-name">{{ client.client_name }}</span>
+                        {% if client.scopes %}
+                            <ul class="permissions">
+                                {% for s in client.scopes %}
+                                    <li>{{ s }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <form 
+                        method="post" 
+                        action="{% url 'oauth_service:deauthorise-client' %}" 
+                        onsubmit="return confirm('Are you sure you want to revoke all access for {{ client.client_id }}?');">
                         {% csrf_token %}
-                        <input type="hidden" name="client_id" value="{{ client.client_id }}">
+                        <input 
+                            type="hidden" 
+                            name="client_id" 
+                            value="{{ client.client_id }}"
+                        >
                         <button type="submit" class="btn-danger revoke-btn">Revoke Access</button>
                     </form>
                 </li>

@@ -68,24 +68,21 @@
     </style>
 </head>
 <body>
-    {% comment %}
     <nav class="navbar">
-        <a href="/" class="brand">OAuth Service</a>
+        <a href="{% url 'oauth_service:index' %}" class="brand">OAuth Service</a>
         <div class="nav-links">
-            {% if user.is_authenticated %}
+            {% if user is not None %}
                 <a href="{% url 'oauth_service:manage-apps' %}">Manage Apps</a>
-                <a href="{% url 'oauth_service:logout' %}">Logout</a>
+                <a href="{% url 'oauth_service:logout-user' %}">Logout</a>
             {% else %}
-                <a href="{% url 'oauth_service:login' %}">Login</a>
+                <a href="{% url 'oauth_service:login-user' %}">Login</a>
                 <a href="{% url 'oauth_service:register-user' %}">Register</a>
             {% endif %}
         </div>
     </nav>
-    {% endcomment %}
     <main class="container">
         <!-- The content block will be filled by child templates -->
         {% block content %}{% endblock %}
     </main>
-
 </body>
 </html>

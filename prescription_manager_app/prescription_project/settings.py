@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "oauth_service.auth.backends.MongoBackend",
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -125,7 +129,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Use Django’s session DB or switch to cache if you don’t want a SQL backend:
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 GRAPHENE = {
     "SCHEMA": "prescription_manager_app.schema.schema",
