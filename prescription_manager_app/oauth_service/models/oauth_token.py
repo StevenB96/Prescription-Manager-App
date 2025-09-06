@@ -2,6 +2,7 @@ import time
 import secrets
 from oauth_service.db.connection import oauth_token_col
 
+# Constants
 ACCESS_TOKEN_LIFETIME = 3600
 
 

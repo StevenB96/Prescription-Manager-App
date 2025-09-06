@@ -6,7 +6,7 @@ from django.urls import reverse
 import secrets
 import time
 from oauth_service.decorators import mongo_login_required
-from oauth_service.auth.session_helpers import get_logged_in_mongo_user
+from oauth_service.auth.session_helpers import get_logged_in_mongo_user, store_token_data, remove_token_data
 from oauth_service.forms import AuthoriseForm, RevokeTokenForm, AccessGrantForm
 from oauth_service.models import OAuthToken, OAuthCode, OAuthClient
 
@@ -104,7 +104,6 @@ def validate_client(
     return client, None
 
 
-@mongo_login_required()
 @require_http_methods(["GET", "POST"])
 def authorise(request):
     mongo_user = get_logged_in_mongo_user(request)
@@ -203,8 +202,6 @@ def token(request):
         code = data["code"]
         redirect_uri = data["redirect_uri"]
         auth_code = OAuthCode.get_by_code(code)
-        print(auth_code.code, auth_code.redirect_uri !=
-              redirect_uri, auth_code.expires_at < now, auth_code.expires_at, now)
 
         if not auth_code or auth_code.redirect_uri != redirect_uri or auth_code.expires_at < now:
             form.add_error("code", "Invalid or expired code")
@@ -227,7 +224,7 @@ def token(request):
 
     token_data = create_tokens(user_id, client_id, scope)
     request.session["messages"] = [{"success": "Access token granted"}]
-    request.session["token_data"] = token_data
+    store_token_data(request, token_data)
 
     return redirect("oauth_service:manage-apps")
 
@@ -256,5 +253,5 @@ def revoke_token(request):
     OAuthToken.delete(token_to_revoke)
 
     request.session["messages"] = [{"success": "Token revoked"}]
-    request.session.pop("token_data", None)
+    remove_token_data(request)
     return redirect("oauth_service:manage-apps")

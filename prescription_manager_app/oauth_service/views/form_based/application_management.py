@@ -14,11 +14,7 @@ from oauth_service.forms import AccessGrantForm, RevokeTokenForm
 @require_http_methods(["GET"])
 def manage_apps(request):
     """Displays all tokens and codes for the logged-in user."""
-    mongo_user = get_logged_in_mongo_user(request)
-    if not mongo_user:
-        return redirect("oauth_service:login-user")
-
-    user_id = str(mongo_user.id)
+    user_id = str(request.mongo_user.id)
 
     # Fetch user tokens and codes
     user_tokens = list(oauth_token_col.find({"user_id": user_id}))
@@ -60,10 +56,6 @@ def manage_apps(request):
 @require_http_methods(["POST"])
 def deauthorise_client(request):
     """Revokes all tokens for a specific client application."""
-    mongo_user = get_logged_in_mongo_user(request)
-    if not mongo_user:
-        return redirect("oauth_service:login-user")
-
     form = DeauthoriseForm(request.POST)
     if not form.is_valid():
         return JsonResponse({"error": form.errors}, status=400)
@@ -71,7 +63,7 @@ def deauthorise_client(request):
     client_id = form.cleaned_data["client_id"]
 
     oauth_token_col.delete_many({
-        "user_id": str(mongo_user.id),
+        "user_id": str(request.mongo_user.id),
         "client_id": client_id
     })
 

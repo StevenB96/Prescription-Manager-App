@@ -1,6 +1,7 @@
 import time
 from oauth_service.db.connection import oauth_code_col
 
+# Constants
 AUTH_CODE_LIFETIME = 600
 
 

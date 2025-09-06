@@ -3,10 +3,12 @@
 from django.urls import path
 from . import views
 from django.shortcuts import render
+from oauth_service.decorators import oauth_token_required
 
 app_name = 'prescription_manager_app'
 
 
+@oauth_token_required()
 def home(request):
     return render(request, 'prescription_manager_app/admin/base.html')
 
