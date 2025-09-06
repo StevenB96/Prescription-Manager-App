@@ -8,92 +8,77 @@
     .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; }
     .item-info { max-width: 70%; }
     .item-type { font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-    .action-btn { padding: 8px 12px; font-size: 0.9em; border-radius: 6px; }
+    .action-btn { padding: 8px 12px; font-size: 0.9em; border-radius: 6px; cursor: pointer; }
     .btn-danger { background-color: #e74c3c; color: #fff; border: none; }
     .btn-success { background-color: #2ecc71; color: #fff; border: none; }
     .no-items { text-align: center; color: #777; padding: 20px; }
+    .errorlist { color: #e74c3c; margin: 5px 0 0 0; list-style: none; padding: 0; }
 </style>
 
 <h1>Manage Tokens & Codes</h1>
 <p style="text-align: center;">You can revoke tokens or exchange codes below.</p>
+<p style="text-align: center; color: #e67e22; font-weight: bold;">
+    ⚠️ Note: Granting or revoking a code or token will update or delete your current token in this session.
+</p>
 
-{% if items %}
+{% if forms %}
     <ul class="item-list">
-        {% for item in items %}
-            <li class="item">
-                <div class="item-info">
-                    <div class="item-type">{{ item.type }}</div>
-                    <div><strong>Client ID:</strong> {{ item.client_id }}</div>
-                    {% if item.type == "token" %}
-                        <div><strong>Access Token:</strong> {{ item.access_token }}</div>
-                        <div><strong>Refresh Token:</strong> {{ item.refresh_token }}</div>
-                        <div><strong>Expires At:</strong> {{ item.expires_at }}</div>
-                    {% else %}
-                        <div><strong>Code:</strong> {{ item.code }}</div>
-                        <div><strong>Redirect URI:</strong> {{ item.redirect_uri }}</div>
-                        <div><strong>Expires At:</strong> {{ item.expires_at }}</div>
-                    {% endif %}
-                    <div><strong>Scope:</strong> {{ item.scope }}</div>
-                    <div><strong>Created At:</strong> {{ item.created_at }}</div>
-                </div>
-
-                <div class="item-action">
-                    {% if item.type == "token" %}
-                        <!-- Revoke Token -->
+        {% for form in forms %}
+            {% if form.form_type == 'token' %}
+                <!-- Revoke token form -->
+                <li class="item">
+                    <div class="item-info">
+                        <div class="item-type">Token</div>
+                        <div><strong>Client ID:</strong> {{ form.initial.client_id }}</div>
+                        <div><strong>Access Token:</strong> {{ form.initial.token }}</div>
+                    </div>
+                    <div class="item-action">
                         <form method="post" action="{% url 'oauth_service:revoke-token' %}"
-                              onsubmit="return confirm('Revoke this token?');">
+                              onsubmit="return confirm('Revoke this token? This will delete it from your session.');">
                             {% csrf_token %}
-                            <input 
-                                type="hidden" 
-                                name="client_id" 
-                                value="{{ item.client_id }}"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="client_secret" 
-                                value="{{ item.client_secret }}"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="token" 
-                                value="{{ item.refresh_token }}"
-                            >
+                            {{ form.as_p }}
                             <button type="submit" class="action-btn btn-danger">Revoke Access</button>
+                            {% if form.errors %}
+                                <ul class="errorlist">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </form>
-                    {% else %}
-                        <!-- Exchange Code for Token -->
-                        <form method="post" action="{% url 'oauth_service:token' %}">
+                    </div>
+                </li>
+
+            {% elif form.form_type == 'code' %}
+                <!-- Access grant form -->
+                <li class="item">
+                    <div class="item-info">
+                        <div class="item-type">Code</div>
+                        <div><strong>Client ID:</strong> {{ form.initial.client_id }}</div>
+                        <div><strong>Code:</strong> {{ form.initial.code }}</div>
+                        <div><strong>Redirect URI:</strong> {{ form.initial.redirect_uri }}</div>
+                    </div>
+                    <div class="item-action">
+                        <form method="post" action="{% url 'oauth_service:token' %}"
+                              onsubmit="return confirm('Granting this access will set a new token in your session. Continue?');">
                             {% csrf_token %}
-                            <input 
-                                type="hidden" 
-                                name="grant_type" 
-                                value="authorization_code"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="client_id" 
-                                value="{{ item.client_id }}"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="client_secret" 
-                                value="{{ item.client_secret }}"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="code" 
-                                value="{{ item.code }}"
-                            >
-                            <input 
-                                type="hidden" 
-                                name="redirect_uri" 
-                                value="{{ item.redirect_uri }}"
-                            >
+                            {{ form.as_p }}
                             <button type="submit" class="action-btn btn-success">Grant Access</button>
+                            {% if form.errors %}
+                                <ul class="errorlist">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </form>
-                    {% endif %}
-                </div>
-            </li>
+                    </div>
+                </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% else %}

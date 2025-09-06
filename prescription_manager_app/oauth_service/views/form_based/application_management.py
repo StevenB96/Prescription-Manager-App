@@ -6,9 +6,10 @@ from oauth_service.db.connection import oauth_code_col, oauth_token_col
 from oauth_service.auth.session_helpers import get_logged_in_mongo_user
 from oauth_service.forms import DeauthoriseForm
 from django.conf import settings
+from oauth_service.forms import AccessGrantForm, RevokeTokenForm
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def manage_apps(request):
     """Displays all tokens and codes for the logged-in user."""
     mongo_user = get_logged_in_mongo_user(request)
@@ -22,36 +23,34 @@ def manage_apps(request):
     user_codes = list(oauth_code_col.find({"user_id": user_id}))
 
     # Normalize into a single list with type labels
-    items = []
+    forms = []
 
+    # User tokens / refresh tokens
     for t in user_tokens:
-        items.append({
-            "type": "token",
+        form = RevokeTokenForm(initial={
             "client_id": t["client_id"],
             "client_secret": settings.INTERNAL_OAUTH_CLIENT_SECRET,
-            "access_token": t.get("access_token"),
-            "refresh_token": t.get("refresh_token"),
-            "expires_at": t.get("expires_at"),
-            "scope": t.get("scope"),
-            "created_at": t.get("created_at"),
+            "token": t.get("access_token"),
         })
+        form.form_type = "token"
+        forms.append(form)
 
+    # User codes / authorization codes
     for c in user_codes:
-        items.append({
-            "type": "code",
+        form = AccessGrantForm(initial={
+            "grant_type": "authorization_code",
             "client_id": c["client_id"],
             "client_secret": settings.INTERNAL_OAUTH_CLIENT_SECRET,
             "code": c.get("code"),
             "redirect_uri": c.get("redirect_uri"),
-            "expires_at": c.get("expires_at"),
-            "scope": c.get("scope"),
-            "created_at": c.get("created_at"),
         })
+        form.form_type = "code"
+        forms.append(form)
 
     return render(
         request,
         "oauth_service/manage_apps.html",
-        {"items": items},
+        {"forms": forms},
     )
 
 

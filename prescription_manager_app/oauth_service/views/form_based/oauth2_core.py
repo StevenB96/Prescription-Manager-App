@@ -8,12 +8,8 @@ import secrets
 import time
 
 from oauth_service.auth.session_helpers import get_logged_in_mongo_user
-from oauth_service.db.connection import oauth_client_col, oauth_code_col, oauth_token_col
-from oauth_service.forms import AuthoriseForm, TokenForm, RevokeForm
-
-# --- Constants ---
-ACCESS_TOKEN_LIFETIME = 3600  # seconds
-AUTH_CODE_LIFETIME = 600  # seconds
+from oauth_service.forms import AuthoriseForm, RevokeTokenForm, AccessGrantForm
+from oauth_service.models import OAuthToken, OAuthCode, OAuthClient
 
 
 def build_manage_apps_redirect(
@@ -32,28 +28,79 @@ def build_manage_apps_redirect(
     return url
 
 
-def parse_client_scope(scope_value):
-    if not scope_value:
-        raise ValueError("Client scope must not be empty or None")
-    return set(s.strip() for s in scope_value.split(',') if s.strip())
+def create_tokens(user_id, client_id, scope):
+    """
+    Generate access and refresh tokens and save them in the DB using the OAuthToken model.
+    Returns a dictionary containing token info.
+    """
+    # Use the model to generate and persist the tokens
+    token = OAuthToken.create(
+        user_id=user_id,
+        client_id=client_id,
+        scope=scope
+    )
+
+    # Return token data in the same format as before
+    return {
+        "access_token": token.access_token,
+        "refresh_token": token.refresh_token,
+        "expires_at": token.expires_at,
+        "scope": token.scope,
+        "user_id": token.user_id,
+    }
 
 
-def _validate_client(client_id, redirect_uri, response_type, scope):
-    client = oauth_client_col.find_one({"client_id": client_id})
+def validate_client(
+    client_id,
+    client_secret=None,
+    redirect_uri=None,
+    response_type=None,
+    scope=None,
+    require_secret=False,
+    require_redirect=False,
+    require_response_type=False,
+    require_scope=False,
+):
+    """
+    Validate OAuth client for various endpoints.
+
+    Parameters:
+    - client_id: str (required)
+    - client_secret: str (optional)
+    - redirect_uri: str (optional)
+    - response_type: str (optional)
+    - scope: str (optional, space-separated)
+    - require_secret: bool, if True, client_secret must match
+    - require_redirect: bool, if True, redirect_uri must be valid
+    - require_response_type: bool, if True, response_type must be valid
+    - require_scope: bool, if True, scope must be valid
+
+    Returns:
+    - client object if valid
+    - JsonResponse with error if invalid
+    """
+
+    client = OAuthClient.get_by_client_id(client_id)
+
     if not client:
         return None, JsonResponse({"error": "Invalid client_id"}, status=400)
-    if redirect_uri not in client.get("redirect_uris", []):
+
+    if require_secret and (not client_secret or client.client_secret != client_secret):
+        return None, JsonResponse({"error": "Invalid client_secret"}, status=400)
+
+    if require_redirect and redirect_uri not in client.redirect_uris:
         return None, JsonResponse({"error": "Invalid redirect_uri"}, status=400)
-    if response_type not in client.get("response_types", []):
+
+    if require_response_type and response_type not in client.response_types:
         return None, JsonResponse({"error": "Unsupported response_type"}, status=400)
 
-    client_scopes = set(client.get("scopes") or [])
-    if not client_scopes:
-        raise ValueError("Client scopes must be a non-empty array")
-
-    requested_scopes = set((scope or "").split())
-    if not requested_scopes.issubset(client_scopes):
-        return None, JsonResponse({"error": "Invalid scope"}, status=400)
+    client_scopes = client.scopes or []
+    if require_scope:
+        if not client_scopes:
+            return None, JsonResponse({"error": "Client scopes must be a non-empty array"}, status=400)
+        requested_scopes = set((scope or "").split())
+        if not requested_scopes.issubset(client_scopes):
+            return None, JsonResponse({"error": "Invalid scope"}, status=400)
 
     return client, None
 
@@ -77,8 +124,15 @@ def authorise(request):
     scope = form.cleaned_data["scope"]
     state = form.cleaned_data.get("state", "")
 
-    client, error = _validate_client(
-        client_id, redirect_uri, response_type, scope)
+    client, error = validate_client(
+        client_id,
+        redirect_uri=redirect_uri,
+        response_type=response_type,
+        scope=scope,
+        require_redirect=True,
+        require_response_type=True,
+        require_scope=True
+    )
     if error:
         return error
 
@@ -99,107 +153,109 @@ def authorise(request):
         return redirect(url)
 
     code = secrets.token_urlsafe(24)
-    now = int(time.time())
-    oauth_code_col.insert_one({
-        "code": code,
-        "client_id": client_id,
-        "redirect_uri": redirect_uri,
-        "user_id": str(mongo_user.id),
-        "scope": scope,
-        "created_at": now,
-        "expires_at": now + AUTH_CODE_LIFETIME,
-    })
+    oauth_code = OAuthCode.create(
+        code=code,
+        client_id=client_id,
+        user_id=str(mongo_user.id),
+        redirect_uri=redirect_uri,
+        scope=scope
+    )
 
     url = build_manage_apps_redirect(
         redirect_uri,
         state,
-        code
+        oauth_code.code
     )
     return redirect(url)
 
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def token(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST required"}, status=405)
-
-    form = TokenForm(request.POST)
+    form = AccessGrantForm(request.POST)
     if not form.is_valid():
-        return JsonResponse({"error": form.errors}, status=400)
+        request.session["messages"] = [{"errors": form.errors}]
+        return redirect("oauth_service:manage-apps")
 
     data = form.cleaned_data
+    client_id = data["client_id"]
     grant_type = data["grant_type"]
+    client_secret = data.get("client_secret")
 
-    client_id = data.get("client_id") or request.POST.get("client_id")
-    client_secret = data.get(
-        "client_secret") or request.POST.get("client_secret")
-    client = oauth_client_col.find_one({"client_id": client_id})
-    if not client or client.get("client_secret") != client_secret:
-        return JsonResponse({"error": "Invalid client credentials"}, status=401)
-    if grant_type not in client.get("grant_types", []):
-        return JsonResponse({"error": "Unsupported grant type"}, status=400)
+    client, error = validate_client(
+        client_id,
+        client_secret=client_secret,
+        require_secret=True
+    )
+    if error:
+        form.add_error("client_id", error)
+        request.session["messages"] = [{"errors": form.errors}]
+        return redirect("oauth_service:manage-apps")
 
-    user_id, scope = None, None
+    if grant_type not in client.grant_types:
+        form.add_error("grant_type", "Unsupported grant type")
+        request.session["messages"] = [{"errors": form.errors}]
+        return redirect("oauth_service:manage-apps")
+
     now = int(time.time())
+    user_id, scope = None, None
 
     if grant_type == "authorization_code":
         code = data["code"]
         redirect_uri = data["redirect_uri"]
-        auth_code = oauth_code_col.find_one_and_delete(
-            {"code": code, "client_id": client_id}
-        )
-        if not auth_code or auth_code.get("redirect_uri") != redirect_uri or auth_code.get("expires_at", 0) < now:
-            return JsonResponse({"error": "Invalid or expired code"}, status=400)
-        user_id, scope = auth_code["user_id"], auth_code.get("scope")
+        auth_code = OAuthCode.get_by_code(code)
+        print(auth_code.code, auth_code.redirect_uri !=
+              redirect_uri, auth_code.expires_at < now, auth_code.expires_at, now)
+
+        if not auth_code or auth_code.redirect_uri != redirect_uri or auth_code.expires_at < now:
+            form.add_error("code", "Invalid or expired code")
+        else:
+            OAuthCode.delete(code)
+            user_id, scope = auth_code.user_id, auth_code.scope
 
     elif grant_type == "refresh_token":
-        token_data = oauth_token_col.find_one_and_delete(
-            {"refresh_token": data["refresh_token"], "client_id": client_id}
-        )
-        if not token_data:
-            return JsonResponse({"error": "Invalid or revoked refresh token"}, status=400)
-        user_id, scope = token_data["user_id"], token_data.get("scope")
+        token = OAuthToken.get_by_refresh_token(data["refresh_token"])
+        if not token or token.client_id != client_id:
+            form.add_error("refresh_token", "Invalid or revoked refresh token")
+        else:
+            OAuthToken.delete(token.refresh_token)
+            user_id, scope = token.user_id, token.scope
 
-    access_token = secrets.token_urlsafe(32)
-    refresh_token = secrets.token_urlsafe(32)
-    expires_at = now + ACCESS_TOKEN_LIFETIME
+    if form.errors:
+        print(form.errors)
+        request.session["messages"] = [{"errors": form.errors}]
+        return redirect("oauth_service:manage-apps")
 
-    oauth_token_col.insert_one({
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "expires_at": expires_at,
-        "client_id": client_id,
-        "user_id": user_id,
-        "scope": scope,
-        "created_at": now,
-    })
+    token_data = create_tokens(user_id, client_id, scope)
+    request.session["messages"] = [{"success": "Access token granted"}]
+    request.session["token_data"] = token_data
 
-    return JsonResponse({
-        "access_token": access_token,
-        "token_type": "Bearer",
-        "expires_in": ACCESS_TOKEN_LIFETIME,
-        "refresh_token": refresh_token,
-        "scope": scope,
-    })
+    return redirect("oauth_service:manage-apps")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def revoke_token(request):
-    form = RevokeForm(request.POST)
+    form = RevokeTokenForm(request.POST)
     if not form.is_valid():
-        return JsonResponse({"error": form.errors}, status=400)
+        request.session["messages"] = [{"errors": form.errors}]
+        return redirect("oauth_service:manage-apps")
 
     client_id = form.cleaned_data["client_id"]
     client_secret = form.cleaned_data["client_secret"]
-    client = oauth_client_col.find_one({"client_id": client_id})
-    if not client or client.get("client_secret") != client_secret:
-        return JsonResponse({"error": "Invalid client credentials"}, status=401)
-
     token_to_revoke = form.cleaned_data["token"]
-    oauth_token_col.delete_many({
-        "$or": [{"access_token": token_to_revoke}, {"refresh_token": token_to_revoke}],
-        "client_id": client_id,
-    })
 
-    return JsonResponse({}, status=200)
+    client, error = validate_client(
+        client_id,
+        client_secret=client_secret,
+        require_secret=True
+    )
+    if error:
+        request.session["messages"] = [{"errors": {"client_id": [error]}}]
+        return redirect("oauth_service:manage-apps")
+
+    OAuthToken.delete(token_to_revoke)
+
+    request.session["messages"] = [{"success": "Token revoked"}]
+    request.session.pop("token_data", None)
+    return redirect("oauth_service:manage-apps")

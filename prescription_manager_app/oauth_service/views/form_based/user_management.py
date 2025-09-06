@@ -18,7 +18,7 @@ def build_authorisation_redirect():
     params = {
         'client_id': settings.INTERNAL_OAUTH_CLIENT_ID,
         'state': 'placeholder',
-        'scope': 'facility user medication prescription appointment',
+        'scope': 'facility medication prescription appointment',
         'redirect_uri': 'http://localhost:8000/oauth/manage-apps',
         'response_type': 'code'
     }
