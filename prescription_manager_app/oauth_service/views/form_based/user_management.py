@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.conf import settings
+from oauth_service.decorators import mongo_login_required
 from oauth_service.forms import RegisterForm, LoginForm
 from prescription_manager_app.models.user import User
 from oauth_service.auth.session_helpers import (
@@ -56,7 +57,6 @@ def register_user(request):
     })
 
 
-@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def login_user(request):
     """Handles user login using Django Forms."""
@@ -79,6 +79,7 @@ def login_user(request):
     })
 
 
+@mongo_login_required()
 @require_http_methods(["GET"])
 def logout_user(request):
     """Logs out the user from Django session."""

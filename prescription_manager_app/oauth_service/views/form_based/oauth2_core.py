@@ -1,12 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.urls import reverse
 import secrets
 import time
-
+from oauth_service.decorators import mongo_login_required
 from oauth_service.auth.session_helpers import get_logged_in_mongo_user
 from oauth_service.forms import AuthoriseForm, RevokeTokenForm, AccessGrantForm
 from oauth_service.models import OAuthToken, OAuthCode, OAuthClient
@@ -105,7 +104,7 @@ def validate_client(
     return client, None
 
 
-@csrf_exempt
+@mongo_login_required()
 @require_http_methods(["GET", "POST"])
 def authorise(request):
     mongo_user = get_logged_in_mongo_user(request)
@@ -169,7 +168,7 @@ def authorise(request):
     return redirect(url)
 
 
-@csrf_exempt
+@mongo_login_required()
 @require_http_methods(["POST"])
 def token(request):
     form = AccessGrantForm(request.POST)
@@ -233,7 +232,7 @@ def token(request):
     return redirect("oauth_service:manage-apps")
 
 
-@csrf_exempt
+@mongo_login_required()
 @require_http_methods(["POST"])
 def revoke_token(request):
     form = RevokeTokenForm(request.POST)

@@ -81,8 +81,12 @@
         </div>
     </nav>
     <main class="container">
-        <!-- The content block will be filled by child templates -->
-        {% block content %}{% endblock %}
+        {% block content %}
+        <div style="text-align: center; color: #777; padding: 40px;">
+            <h2>Welcome to the OAuth Service</h2>
+            <p>Select an option from the menu above to get started.</p>
+        </div>
+        {% endblock %}
     </main>
 </body>
 </html>

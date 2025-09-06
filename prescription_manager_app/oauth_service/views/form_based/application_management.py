@@ -4,11 +4,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from oauth_service.db.connection import oauth_code_col, oauth_token_col
 from oauth_service.auth.session_helpers import get_logged_in_mongo_user
+from oauth_service.decorators import mongo_login_required
 from oauth_service.forms import DeauthoriseForm
 from django.conf import settings
 from oauth_service.forms import AccessGrantForm, RevokeTokenForm
 
 
+@mongo_login_required()
 @require_http_methods(["GET"])
 def manage_apps(request):
     """Displays all tokens and codes for the logged-in user."""
@@ -54,6 +56,7 @@ def manage_apps(request):
     )
 
 
+@mongo_login_required()
 @require_http_methods(["POST"])
 def deauthorise_client(request):
     """Revokes all tokens for a specific client application."""
