@@ -1,6 +1,9 @@
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+from django.urls import reverse
+from urllib.parse import urlencode
+from django.conf import settings
 from oauth_service.forms import RegisterForm, LoginForm
 from prescription_manager_app.models.user import User
 from oauth_service.auth.session_helpers import (
@@ -8,6 +11,19 @@ from oauth_service.auth.session_helpers import (
     logout_mongo_user,
     get_logged_in_mongo_user
 )
+
+
+def build_authorisation_redirect():
+    base_url = reverse('oauth_service:authorise')
+    params = {
+        'client_id': settings.INTERNAL_OAUTH_CLIENT_ID,
+        'state': 'placeholder',
+        'scope': 'facility user medication prescription appointment',
+        'redirect_uri': 'http://localhost:8000/oauth/manage-apps',
+        'response_type': 'code'
+    }
+    url = f"{base_url}?{urlencode(params)}"
+    return url
 
 
 @require_http_methods(["GET", "POST"])
@@ -53,7 +69,8 @@ def login_user(request):
         mongo_user = User.get_by_email(email)
         if mongo_user and mongo_user.check_password(password):
             login_mongo_user(request, mongo_user)
-            return redirect("oauth_service:index")
+            url = build_authorisation_redirect()
+            return redirect(url)
         form.add_error(None, "Invalid credentials or inactive account")
 
     return render(request, "oauth_service/login.html", {

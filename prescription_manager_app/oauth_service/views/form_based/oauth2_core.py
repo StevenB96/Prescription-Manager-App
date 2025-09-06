@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.urls import reverse
 import secrets
@@ -13,6 +14,22 @@ from oauth_service.forms import AuthoriseForm, TokenForm, RevokeForm
 # --- Constants ---
 ACCESS_TOKEN_LIFETIME = 3600  # seconds
 AUTH_CODE_LIFETIME = 600  # seconds
+
+
+def build_manage_apps_redirect(
+        redirect_uri: str,
+        state: str,
+        code: str = None
+):
+    params = {}
+    if code:
+        params['code'] = code
+        if state:
+            params['state'] = state
+    else:
+        params['error'] = 'access_denied'
+    url = f"{redirect_uri}?{urlencode(params)}"
+    return url
 
 
 def parse_client_scope(scope_value):
@@ -75,9 +92,11 @@ def authorise(request):
         })
 
     if "allow" not in request.POST:
-        sep = "&" if "?" in redirect_uri else "?"
-        state_param = f"&state={state}" if state else ""
-        return redirect(f"{redirect_uri}{sep}error=access_denied{state_param}")
+        url = build_manage_apps_redirect(
+            redirect_uri,
+            state,
+        )
+        return redirect(url)
 
     code = secrets.token_urlsafe(24)
     now = int(time.time())
@@ -91,9 +110,12 @@ def authorise(request):
         "expires_at": now + AUTH_CODE_LIFETIME,
     })
 
-    sep = "&" if "?" in redirect_uri else "?"
-    state_param = f"&state={state}" if state else ""
-    return redirect(f"{redirect_uri}{sep}code={code}{state_param}")
+    url = build_manage_apps_redirect(
+        redirect_uri,
+        state,
+        code
+    )
+    return redirect(url)
 
 
 @csrf_exempt
