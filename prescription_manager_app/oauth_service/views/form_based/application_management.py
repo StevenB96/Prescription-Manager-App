@@ -14,16 +14,19 @@ from oauth_service.forms import AccessGrantForm, RevokeTokenForm
 @require_http_methods(["GET"])
 def manage_apps(request):
     """Displays all tokens and codes for the logged-in user."""
-    user_id = str(request.mongo_user.id)
+
+    # use the attached mongo_user
+    mongo_user = request.mongo_user
+    print(f"mongo_user: {mongo_user} ({type(mongo_user)})")
+
+    user_id = str(mongo_user.id)
 
     # Fetch user tokens and codes
     user_tokens = list(oauth_token_col.find({"user_id": user_id}))
     user_codes = list(oauth_code_col.find({"user_id": user_id}))
 
-    # Normalize into a single list with type labels
     forms = []
 
-    # User tokens / refresh tokens
     for t in user_tokens:
         form = RevokeTokenForm(initial={
             "client_id": t["client_id"],
@@ -33,7 +36,6 @@ def manage_apps(request):
         form.form_type = "token"
         forms.append(form)
 
-    # User codes / authorization codes
     for c in user_codes:
         form = AccessGrantForm(initial={
             "grant_type": "authorization_code",
@@ -45,11 +47,10 @@ def manage_apps(request):
         form.form_type = "code"
         forms.append(form)
 
-    return render(
-        request,
-        "oauth_service/manage_apps.html",
-        {"forms": forms},
-    )
+    return render(request, "oauth_service/manage_apps.html", {
+        "forms": forms,
+        "mongo_user": mongo_user,
+    })
 
 
 @mongo_login_required()

@@ -1,92 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- The title block can be overridden by child templates -->
-    <title>{% block title %}OAuth Service{% endblock %}</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            background-color: #fff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        .navbar .brand {
-            font-size: 1.5rem;
-        }
-        .navbar .nav-links a {
-            margin-left: 1rem;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 25px;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1, h2 { text-align: center; color: #343a40; }
-        form { display: flex; flex-direction: column; }
-        label { margin-top: 10px; font-weight: bold; }
-        input[type="text"], input[type="email"], input[type="password"] {
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-        }
-        button[type="submit"] {
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-        .btn-primary { background-color: #007bff; }
-        .btn-success { background-color: #28a745; }
-        .btn-danger { background-color: #dc3545; }
-        .footer-link { text-align: center; margin-top: 20px; font-size: 0.9em; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{% block title %}OAuth Service{% endblock %}</title>
+
+<style>
+  :root {
+    --bg: #f4f8f4;
+    --panel: #ffffff;
+    --text: #1f2d1f;
+    --muted: #5b6d5b;
+    --border: #d7e3d7;
+    --nav-bg: #e7f1e7;
+    --nav-hover: #d4e7d4;
+    --accent: #2f7d32;
+    --accent-dark: #1f5f24;
+    --danger: #c94f4f;
+  }
+
+  * { box-sizing: border-box; margin:0; padding:0; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .wrapper {
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+  }
+
+  .header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    gap: 16px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color: var(--text);
+  }
+
+  .brand h1 { font-size: 1.4rem; }
+  .brand-mark {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow:0 0 0 4px rgba(47,125,50,0.16);
+  }
+
+  .header-actions a {
+    text-decoration:none;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:8px;
+    background: var(--nav-bg);
+    color: var(--text);
+    border:1px solid var(--border);
+    margin-left:8px;
+  }
+
+    .header-actions a.logout {
+    color: var(--danger);
+  }
+
+  .header-actions a:hover { background: var(--nav-hover); }
+
+  .nav {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:20px;
+  }
+
+  .nav a {
+    text-decoration:none;
+    color: var(--text);
+    padding:8px 12px;
+    border-radius:8px;
+    background: var(--nav-bg);
+    border:1px solid var(--border);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .nav a:hover { background: var(--nav-hover); transform:translateY(-1px); }
+
+  .card {
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+    box-shadow:0 8px 24px rgba(30,50,30,0.05);
+  }
+
+  form { display:flex; flex-direction:column; }
+  label { margin-top:12px; font-weight:600; }
+  input { margin-top:6px; padding:10px; border:1px solid var(--border); border-radius:8px; background:#fff; }
+  button { margin-top:20px; padding:10px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
+
+  .btn-primary { background: var(--accent); color:white; }
+  .btn-primary:hover { background: var(--accent-dark); }
+
+  .btn-success { background: #409a45; color:white; }
+  .btn-success:hover { background: #2f7d32; }
+
+  .btn-danger { background: var(--danger); color:white; }
+  .btn-danger:hover { filter: brightness(0.95); }
+
+  .page-intro { text-align:center; color: var(--muted); }
+  .page-intro h2 { margin-bottom:8px; }
+</style>
+
+{% block head %}{% endblock %}
 </head>
+
 <body>
-    <nav class="navbar">
-        <a href="{% url 'oauth_service:index' %}" class="brand">OAuth Service</a>
-        <div class="nav-links">
-            {% if user is not None %}
-                <a href="{% url 'oauth_service:manage-apps' %}">Manage Apps</a>
-                <a href="{% url 'oauth_service:logout-user' %}">Logout</a>
-            {% else %}
-                <a href="{% url 'oauth_service:login-user' %}">Login</a>
-                <a href="{% url 'oauth_service:register-user' %}">Register</a>
+  <div class="wrapper">
+    <header class="header">
+      <a class="brand" href="{% url 'oauth_service:index' %}">
+        <span class="brand-mark"></span>
+        <h1>OAuth Service</h1>
+      </a>
+
+      <div class="header-actions">
+        {% if mongo_user %}
+            {% if mongo_user.role == 3 %}
+            <a href="{% url 'prescription_manager_app:home' %}">Admin</a>
             {% endif %}
-        </div>
+          <a class="logout" href="{% url 'oauth_service:logout-user' %}">Logout</a>
+        {% else %}
+          <a href="{% url 'oauth_service:login-user' %}">Login</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <nav class="nav">
+      {% if mongo_user %}
+        <a href="{% url 'oauth_service:manage-apps' %}">Manage Apps</a>
+
+      {% else %}
+        <a href="{% url 'oauth_service:login-user' %}">Login</a>
+        <a href="{% url 'oauth_service:register-user' %}">Register</a>
+      {% endif %}
     </nav>
-    <main class="container">
-        {% block content %}
-        <div style="text-align: center; color: #777; padding: 40px;">
-            <h2>Welcome to the OAuth Service</h2>
-            <p>Select an option from the menu above to get started.</p>
-        </div>
-        {% endblock %}
+
+    <main class="card">
+      {% block content %}
+      <div class="page-intro">
+        <h2>Welcome to the OAuth Service</h2>
+        <p>Select an option from the menu above to get started.</p>
+      </div>
+      {% endblock %}
     </main>
+  </div>
 </body>
 </html>

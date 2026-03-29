@@ -10,10 +10,11 @@ app_name = 'oauth_service'
 
 
 def index(request):
-    user = get_logged_in_mongo_user(request)
+    # Use request.mongo_user if set by middleware/decorator
+    mongo_user = getattr(request, "mongo_user", None)
 
     return render(request, 'oauth_service/base.html', {
-        "user": user
+        "mongo_user": mongo_user
     })
 
 # Typical Screen Order Summary

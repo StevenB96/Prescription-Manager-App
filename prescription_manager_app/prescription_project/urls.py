@@ -20,6 +20,7 @@ from django.urls import path, include
 from graphene_django.views import GraphQLView
 from prescription_manager_app.schema.schema import schema
 from django.views.decorators.csrf import csrf_exempt
+from oauth_service.decorators import oauth_token_required
 
 urlpatterns = [
     path('',
@@ -31,6 +32,10 @@ urlpatterns = [
     ),
     path(
         "graphql/",
-        csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema)),
+        csrf_exempt(
+            oauth_token_required(json=True)(  # <--- Protects the whole endpoint
+                GraphQLView.as_view(graphiql=True, schema=schema)
+            )
+        ),
     ),
 ]

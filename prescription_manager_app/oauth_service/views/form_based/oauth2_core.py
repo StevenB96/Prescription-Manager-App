@@ -136,6 +136,7 @@ def authorise(request):
 
     if request.method == "GET":
         return render(request, "oauth_service/authorise.html", {
+            "mongo_user": mongo_user,
             "client": client,
             "state": state,
             "scope": scope,

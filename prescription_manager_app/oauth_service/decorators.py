@@ -59,3 +59,32 @@ def oauth_token_required(view_func=None, *, redirect_url="oauth_service:login-us
         return _wrapped_view
 
     return decorator(view_func) if view_func else decorator
+
+
+def mongo_admin_required(view_func=None, *, redirect_url="oauth_service:login-user", json=False):
+    """
+    Requires logged-in MongoDB user with role=3 (admin)
+    """
+
+    def decorator(view):
+        @wraps(view)
+        def _wrapped_view(request, *args, **kwargs):
+
+            user = get_logged_in_mongo_user(request)
+
+            if not user:
+                if json:
+                    return JsonResponse({"error": "Authentication required"}, status=401)
+                return redirect(redirect_url)
+
+            if user.role != 3:
+                if json:
+                    return JsonResponse({"error": "Admin privileges required"}, status=403)
+                return redirect(redirect_url)
+
+            request.mongo_user = user
+            return view(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator(view_func) if view_func else decorator

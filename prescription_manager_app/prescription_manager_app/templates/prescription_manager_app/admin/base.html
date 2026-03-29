@@ -1,48 +1,161 @@
-<!-- templates/prescription_manager_app/admin/base.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>{% block title %}App{% endblock %}</title>
-	<link
-		rel="stylesheet"
-		href="https://cdn.jsdelivr.net/npm/modern-css-reset/dist/reset.min.css"
-	>
-	<style>
-		body {
-			font-family: sans-serif;
-			padding: 20px;
-		}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		table {
-			width: 100%;
-			border-collapse: collapse;
-		}
+<title>{% block title %}Prescription Manager{% endblock %}</title>
 
-		th,
-		td {
-			border: 1px solid #ccc;
-			padding: 8px;
-			text-align: left;
-		}
-	</style>
+<style>
+  :root {
+    --bg: #f5f8f5;
+    --panel: #ffffff;
+    --text: #243024;
+    --muted: #5f6f5f;
+    --border: #dbe5db;
+    --nav-bg: #edf5ed;
+    --nav-hover: #dcecdc;
+    --accent: #6fbf73;
+    --accent-dark: #4f9f56;
+    --danger: #c94f4f;
+  }
+
+  /* Reset some defaults */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .wrapper {
+    max-width: 1100px;
+    margin: auto;
+    padding: 24px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .brand h1 {
+    font-size: 1.4rem;
+  }
+
+  .brand-mark {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(111, 191, 115, 0.18);
+  }
+
+  .header-actions a {
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--nav-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-left: 8px;
+  }
+
+  .header-actions a.logout {
+    color: var(--danger);
+  }
+
+  .header-actions a:hover { background: var(--nav-hover); }
+
+  .nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .nav a {
+    text-decoration: none;
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--nav-bg);
+    border: 1px solid var(--border);
+  }
+
+  .nav a:hover { background: var(--nav-hover); }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(30,50,30,0.05);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px;
+  }
+
+  th { background: #eef6ee; font-weight: 700; }
+
+  .page-intro { text-align: center; color: var(--muted); }
+  .page-intro h2 { margin-bottom: 8px; }
+</style>
+
+{% block head %}{% endblock %}
 </head>
+
 <body>
-	<nav>
-		<a href="{% url 'prescription_manager_app:user-list' %}">Users</a>
-		<a href="{% url 'prescription_manager_app:facility-list' %}">Facility</a>
-		<a href="{% url 'prescription_manager_app:medication-list' %}">Medications</a>
-		<a href="{% url 'prescription_manager_app:prescription-list' %}">Prescriptions</a>
-		<a href="{% url 'prescription_manager_app:appointment-list' %}">Appointments</a>
-	</nav>
-	<hr>
-	{% block content %}
-	<section style="max-width:900px;margin:32px auto;padding:24px;background:#fff;border:1px solid #e6e6e6;border-radius:6px;text-align:center;">
-      <h2 style="margin:0 0 8px 0;color:#333;">Welcome to Prescription Manager</h2>
-      <p style="margin:0 0 12px;color:#666;">Select an item from the navigation to get started.</p>
-      <p style="font-size:.9rem;color:#999;">(This is placeholder content in the base template.)</p>
-    </section>
-	{% endblock %}
+  <div class="wrapper">
+    <header class="header">
+      <a class="brand" href="{% url 'prescription_manager_app:home' %}">
+        <span class="brand-mark"></span>
+        <h1>Prescription Manager</h1>
+      </a>
+
+      <div class="header-actions">
+        <a href="{% url 'oauth_service:index' %}">OAuth Service</a>
+        <a class="logout" href="{% url 'oauth_service:logout-user' %}">Logout</a>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <a href="{% url 'prescription_manager_app:user-list' %}">Users</a>
+      <a href="{% url 'prescription_manager_app:facility-list' %}">Facilities</a>
+      <a href="{% url 'prescription_manager_app:medication-list' %}">Medications</a>
+      <a href="{% url 'prescription_manager_app:prescription-list' %}">Prescriptions</a>
+      <a href="{% url 'prescription_manager_app:appointment-list' %}">Appointments</a>
+    </nav>
+
+    <main class="card">
+      {% block content %}
+      <section class="page-intro">
+        <h2>Welcome to Prescription Manager</h2>
+        <p>Select an item from the navigation to get started.</p>
+      </section>
+      {% endblock %}
+    </main>
+  </div>
 </body>
 </html>
