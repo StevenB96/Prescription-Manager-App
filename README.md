@@ -1,105 +1,96 @@
+# Prescription Manager & OAuth Identity Provider
+
+A sophisticated Django-based healthcare management system that demonstrates an advanced integration of **NoSQL databases**, **GraphQL APIs**, and a custom-built **OAuth 2.0 Identity Provider**.
+
+## 📌 Project Overview
+This project serves as a comprehensive administrative tool for medical environments. It is split into two primary domains:
+1.  **Prescription Manager App:** An administrative CRUD interface and GraphQL API for managing users, medications, facilities, appointments, and prescriptions.
+2.  **OAuth Service:** A custom implementation of the OAuth 2.0 protocol, allowing the system to act as an identity provider to authorize internal and external applications.
+
+## 🚀 Key Skills Demonstrated
+*   **Advanced NoSQL Integration (MongoDB + PyMongo):** Developed custom wrapper classes for BSON serialization and ObjectId management, bypassing the standard Django ORM.
+*   **Custom OAuth 2.0 Implementation:** Ground-up implementation of `authorization_code` and `refresh_token` flows, including custom consent screens and token management.
+*   **Modern API Design (GraphQL):** Flexible data-fetching layer using **Graphene-Django** to resolve complex connections between NoSQL documents.
+*   **Security & Authentication:** Industry-standard password hashing using `bcrypt` and custom Python decorators (`@oauth_token_required`) to protect resources.
 
 ---
 
-## Folder Structure
+## 📂 Folder Structure
 
 ```plaintext
 manage.py
-prescription_manager_app/
-├── admin.py
-├── apps.py
-├── backends.py
-├── db.py
-├── models.py
-├── tests.py
-├── urls.py
-├── views.py
-├── __init__.py
-├── migrations/
-│   └── __init__.py
-├── models/
-│   ├── appointment.py
-│   ├── facility.py
-│   ├── medication.py
-│   ├── prescription.py
-│   ├── user.py
-│   └── __init__.py
-├── oauth/
-│   ├── setup.py
-│   └── storage.py
-├── scripts/
-│   └── seed.py
-└── templates/
-    └── prescription_manager_app/
-        ├── base.html
-        ├── appointment/
-        │   ├── confirm_delete.html
-        │   ├── detail.html
-        │   ├── form.html
-        │   └── list.html
-        ├── auth/
-        │   ├── authorise.html
-        │   ├── login.html
-        │   └── register.html
-        ├── facility/
-        │   ├── confirm_delete.html
-        │   ├── detail.html
-        │   ├── form.html
-        │   └── list.html
-        ├── medication/
-        │   ├── confirm_delete.html
-        │   ├── detail.html
-        │   ├── form.html
-        │   └── list.html
-        ├── prescription/
-        │   ├── confirm_delete.html
-        │   ├── detail.html
-        │   ├── form.html
-        │   └── list.html
-        └── user/
-            ├── confirm_delete.html
-            ├── detail.html
-            ├── form.html
-            └── list.html
-prescription_project/
-├── asgi.py
-├── settings.py
-├── urls.py
-├── wsgi.py
-└── __init__.py
+global_utils/               # Shared security and auth utilities
+├── auth.py                 # Bcrypt hashing and verification
+oauth_service/              # Custom OAuth 2.0 Identity Provider App
+├── auth/                   # Session helpers and backends
+├── db/                     # MongoDB connection handles
+├── management/commands/    # Seed scripts for OAuth clients
+├── models/                 # PyMongo wrappers for Clients, Codes, and Tokens
+├── templates/              # Login, Register, and Authorisation UI
+└── views/                  # Core OAuth protocol logic
+prescription_manager_app/   # Healthcare Management App
+├── db/                     # MongoDB connection handles
+├── management/commands/    # Seed scripts for medical content
+├── models/                 # PyMongo wrappers for medical entities
+├── schema/                 # GraphQL Queries, Mutations, and Types
+├── templates/              # CRUD Admin UI for healthcare entities
+└── views/                  # Traditional Django views for CRUD
+prescription_project/       # Project configuration
+├── settings.py             # App, Auth, and OAuth settings
+└── urls.py                 # Main routing (GraphQL, OAuth, and App)
 ```
 
 ---
 
-## Getting Started
+## 🚦 Getting Started
+
 ### Step 1: Create a virtual environment
 ```bash
 python -m venv .venv
 ```
+
 ### Step 2: Activate the virtual environment
-On macOS/Linux:
+**macOS/Linux:**
 ```bash
 source .venv/bin/activate
 ```
-On Windows:
+**Windows:**
 ```bash
-.\venv\Scripts\activate
+.\.venv\Scripts\activate
 ```
-### Step 3: Install Django
+
+### Step 3: Install Dependencies
+Ensure you have MongoDB running on `localhost:27017`, then install the requirements:
 ```bash
-pip install django
+pip install -r requirements.txt
 ```
-### Step 4: Create a new Django project named 'prescription_project'
+*(Note: If you do not have a requirements.txt, install the core packages: `pip install django pymongo graphene-django bcrypt`)*
+
+### Step 4: Database Seeding
+Unlike standard Django projects, this NoSQL project uses custom management commands to populate MongoDB:
 ```bash
-django-admin startproject prescription_project .
+# Seed the OAuth Client (Internal App credentials)
+python manage.py seed_oauth
+
+# Seed the Healthcare Data (Users, Meds, Facilities, etc.)
+python manage.py seed_content
 ```
-### Step 5: Create a new Django app called 'prescription_manager_app'
-```bash
-python manage.py startapp prescription_manager_app
-```
-### Step 6: Run the development server
+
+### Step 5: Run the development server
 ```bash
 python manage.py runserver
 ```
 
 ---
+
+## 🛠 Tech Stack
+*   **Framework:** Django (Python)
+*   **Database:** MongoDB (via PyMongo)
+*   **API:** GraphQL (Graphene-Django)
+*   **Authentication:** Custom OAuth 2.0 & Bcrypt
+*   **Frontend:** Django Templates (Server-Side Rendering)
+
+---
+
+## 📝 Usage Note
+Access the **OAuth Service** at `http://localhost:8000/oauth/` to register or login. Once authenticated, you can access the **Prescription Admin** dashboard at `http://localhost:8000/admin` and the **GraphQL Playground** at `http://localhost:8000/graphql/`.
