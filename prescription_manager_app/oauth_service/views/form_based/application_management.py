@@ -13,12 +13,7 @@ from oauth_service.forms import AccessGrantForm, RevokeTokenForm
 @mongo_login_required()
 @require_http_methods(["GET"])
 def manage_apps(request):
-    """Displays all tokens and codes for the logged-in user."""
-
-    # use the attached mongo_user
     mongo_user = request.mongo_user
-    print(f"mongo_user: {mongo_user} ({type(mongo_user)})")
-
     user_id = str(mongo_user.id)
 
     # Fetch user tokens and codes

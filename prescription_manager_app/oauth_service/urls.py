@@ -10,8 +10,7 @@ app_name = 'oauth_service'
 
 
 def index(request):
-    # Use request.mongo_user if set by middleware/decorator
-    mongo_user = getattr(request, "mongo_user", None)
+    mongo_user = get_logged_in_mongo_user(request)
 
     return render(request, 'oauth_service/base.html', {
         "mongo_user": mongo_user

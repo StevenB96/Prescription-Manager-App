@@ -138,8 +138,6 @@
             <a href="{% url 'prescription_manager_app:home' %}">Admin</a>
             {% endif %}
           <a class="logout" href="{% url 'oauth_service:logout-user' %}">Logout</a>
-        {% else %}
-          <a href="{% url 'oauth_service:login-user' %}">Login</a>
         {% endif %}
       </div>
     </header>
