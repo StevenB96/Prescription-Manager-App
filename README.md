@@ -18,26 +18,31 @@ This project serves as a comprehensive administrative tool for medical environme
 ## 📂 Folder Structure
 
 ```plaintext
-manage.py
-global_utils/               # Shared security and auth utilities
-├── auth.py                 # Bcrypt hashing and verification
-oauth_service/              # Custom OAuth 2.0 Identity Provider App
-├── auth/                   # Session helpers and backends
-├── db/                     # MongoDB connection handles
-├── management/commands/    # Seed scripts for OAuth clients
-├── models/                 # PyMongo wrappers for Clients, Codes, and Tokens
-├── templates/              # Login, Register, and Authorisation UI
-└── views/                  # Core OAuth protocol logic
-prescription_manager_app/   # Healthcare Management App
-├── db/                     # MongoDB connection handles
-├── management/commands/    # Seed scripts for medical content
-├── models/                 # PyMongo wrappers for medical entities
-├── schema/                 # GraphQL Queries, Mutations, and Types
-├── templates/              # CRUD Admin UI for healthcare entities
-└── views/                  # Traditional Django views for CRUD
-prescription_project/       # Project configuration
-├── settings.py             # App, Auth, and OAuth settings
-└── urls.py                 # Main routing (GraphQL, OAuth, and App)
+├── manage.py                       # Project entry point
+├── global_utils/                   # Shared Security
+│   └── auth.py                     # Bcrypt hashing and verification logic
+├── oauth_service/                  # OAuth 2.0 Identity Provider
+│   ├── models/                     # PyMongo wrappers for Clients, Codes, and Tokens
+│   ├── templates/                  # UI for Auth (Login, Register, Consent, Manage Apps)
+│   ├── views/                      # Protocol logic (Token, Authorise, User Management)
+│   ├── auth/                       # MongoDB session and backend helpers
+│   ├── forms.py                    # Validation for OAuth flows and registration
+│   └── urls.py                     # Routing for /oauth/ endpoints
+├── prescription_manager_app/       # Healthcare Management App
+│   ├── models/                     # PyMongo wrappers (User, Med, Facility, Appt, Rx)
+│   ├── views/                      # CRUD logic for all medical entities
+│   ├── templates/                  # Standard Admin UI (List, Detail, Form, Delete)
+│   │                                 for all core healthcare entities
+│   ├── schema/                     # GraphQL (Graphene) implementation:
+│   │   ├── types.py                # Type definitions for all entities
+│   │   ├── queries/                # Fetching logic for all entities
+│   │   ├── mutations/              # Create/Update/Delete for all entities
+│   │   └── schema.py               # Root Query/Mutation assembly
+│   ├── management/commands/        # Database seed scripts (Medical Content)
+│   └── urls.py                     # Routing for Admin/CRUD interfaces
+└── prescription_project/           # Project Configuration
+    ├── settings.py                 # App/Auth/OAuth config and MongoDB settings
+    └── urls.py                     # Main dispatcher (GraphQL, OAuth, and App URLs)
 ```
 
 ---
