@@ -1,17 +1,21 @@
-# Prescription Manager & OAuth Identity Provider
+# 💊 Prescription Manager & OAuth Identity Provider
 
-A sophisticated Django-based healthcare management system that demonstrates an advanced integration of **NoSQL databases**, **GraphQL APIs**, and a custom-built **OAuth 2.0 Identity Provider**.
+This project is a sophisticated healthcare management system built with **Django** and **MongoDB**. It serves as a comprehensive administrative tool for medical environments, demonstrating how to integrate NoSQL databases and modern API protocols into a unified healthcare stack.
 
-## 📌 Project Overview
-This project serves as a comprehensive administrative tool for medical environments. It is split into two primary domains:
-1.  **Prescription Manager App:** An administrative CRUD interface and GraphQL API for managing users, medications, facilities, appointments, and prescriptions.
-2.  **OAuth Service:** A custom implementation of the OAuth 2.0 protocol, allowing the system to act as an identity provider to authorize internal and external applications.
+---
 
 ## 🚀 Key Skills Demonstrated
-*   **Advanced NoSQL Integration (MongoDB + PyMongo):** Developed custom wrapper classes for BSON serialization and ObjectId management, bypassing the standard Django ORM.
+*   **Advanced NoSQL Integration (MongoDB + PyMongo):** Developed custom wrapper classes for BSON serialisation and ObjectId management, bypassing the standard Django ORM.
 *   **Custom OAuth 2.0 Implementation:** Ground-up implementation of `authorization_code` and `refresh_token` flows, including custom consent screens and token management.
 *   **Modern API Design (GraphQL):** Flexible data-fetching layer using **Graphene-Django** to resolve complex connections between NoSQL documents.
 *   **Security & Authentication:** Industry-standard password hashing using `bcrypt` and custom Python decorators (`@oauth_token_required`) to protect resources.
+
+---
+
+## 📌 Functional Overview
+The system is split into two primary functional domains:
+*   **Prescription Manager App:** An administrative CRUD interface and GraphQL API used to manage the lifecycle of healthcare data, including users, medications, facilities, appointments, and prescriptions.
+*   **OAuth Identity Service:** A custom-built implementation of the OAuth 2.0 protocol that allows the system to act as a central identity provider, authorising both internal modules and external applications via `authorization_code` and `refresh_token` flows.
 
 ---
 
